@@ -20,14 +20,15 @@ Before setting up the KeyVault Server, ensure the following:
 ## Installation
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/zenforcode/data-vault.git
+   git clone https://github.com/zenforcode/keyfort
    cd data-vault
    ```
 
 2. **Set up a virtual environment**:
    ```bash
+   pip install uv
    uv venv
-   soyrce .venv/bin/activate
+   source .venv/bin/activate
    ```
 
 3. **Install dependencies**:
@@ -55,7 +56,7 @@ Before setting up the KeyVault Server, ensure the following:
 ## Configuration
 All configurations are managed through the `.env` file. Key settings include:
 - `DB_CONNECTION`: Database connection string (e.g., `mongodb://localhost:27017/keyvault` or `postgresql://user:password@localhost/keyvault`)
-- `SECRET_KEY`: Encryption key for securing data.
+- `TOKEN_API_KEY`: Encryption key for securing data.
 - `API_PORT`: Port number for the server.
 - `LOG_LEVEL`: Logging verbosity (e.g., DEBUG, INFO, WARNING).
 
