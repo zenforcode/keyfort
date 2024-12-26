@@ -21,7 +21,7 @@ Before setting up the KeyVault Server, ensure the following:
 1. **Clone the repository**:
    ```bash
    git clone https://github.com/zenforcode/keyfort
-   cd data-vault
+   cd keyfort
    ```
 
 2. **Set up a virtual environment**:
