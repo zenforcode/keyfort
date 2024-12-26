@@ -11,4 +11,4 @@ WORKDIR /app
 RUN uv sync --frozen --no-cache
 
 # Run the application.
-CMD [".venv/bin/fastapi", "run", "/app/keyfort/main.py", "--port", "80", "--host", "0.0.0.0"]
+CMD [".venv/bin/fastapi", "run", "keyfort/main.py", "--port", "80", "--host", "0.0.0.0"]
