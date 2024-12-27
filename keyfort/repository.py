@@ -1,8 +1,8 @@
+"""Data Repository Pattern"""
+
 from typing import Tuple, Optional, NoReturn
 from models import Secret, Metadata, Version
 from copy import deepcopy
-from uuid import uuid4
-from time import strftime
 from datetime import datetime
 
 IN_MEMORY_DB = dict()
@@ -58,6 +58,20 @@ class SecretRepository:
             raise NotCreatedException()
         return secret
 
+    def get_secret_info(self, secret_id: str) -> Optional[Metadata]:
+        """Get secret metadata
+
+        Args:
+            secret_id (str): Secret identifier
+
+        Returns:
+            Optional[Metadata]: Secret matadata.
+        """
+        secret = self.get_secret_meta(secret_id=secret_id)
+        if secret:
+            return secret.metadata
+        return None
+
     def get_secret_meta(self, secret_id: str, meta: bool = False) -> Optional[Secret]:
         """Get secret with or without metadata
 
@@ -76,16 +90,37 @@ class SecretRepository:
             secret.meta = None
         return secret
 
-    def updateSecret(self, old_secret: Secret, secret: Secret):
-        secret_id = self.get_secret(old_secret.secret_id)
-        secret.version = secret.version + 1 
-        IN_MEMORY_DB[secret_id] = secret
+    def update_secret(self, old_secret: Secret, secret: Secret) -> Tuple[bool, str]:
+        """Update secret with a new one
 
-    def invalidateSecret(self, secret_id: str) -> bool:
+        Args:
+            old_secret (Secret): Old secret to update
+            secret (Secret): New secret to update
+
+        Returns:
+            bool: False in case of error.
+        """
+        error, secret_id = self.get_secret(old_secret.secret_id)
+        if error:
+            return True, "Not Found"
+        else:
+            secret.version = secret.version + 1
+            IN_MEMORY_DB[secret_id] = secret
+        return False, "OK"
+
+    def invalidate_secret(self, secret_id: str) -> Tuple[bool, str]:
+        """Invalidate the secret
+
+        Args:
+            secret_id (str): Secret identifier
+
+        Returns:
+            bool: True when the operation has success.
+        """
         err, secret = self.get_secret(secret_id)
         if err:
-            return False
+            return False, "Not Found"
         else:
             secret.metadata.is_active = True
             IN_MEMORY_DB[secret_id] = secret
-            return True
+            return True, "OK"

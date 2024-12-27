@@ -1,1 +1,8 @@
-from .keyfort import Secret, Version, Metadata
+from .keyfort import (
+    Secret,
+    Version,
+    Metadata,
+    CreateSecretPayload,
+    CreateSecretResponse,
+    UpdateSecretPayload,
+)

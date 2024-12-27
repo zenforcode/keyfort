@@ -4,4 +4,8 @@ version = "0.1.0"
 description = "KeyFort is a secure, centralized solution for managing and storing sensitive data such as API keys, credentials, tokens, and other secrets."
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "coverage>=7.6.10",
+    "fastapi>=0.115.6",
+    "pytest>=8.3.4",
+]
