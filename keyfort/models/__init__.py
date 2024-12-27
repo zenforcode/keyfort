@@ -1,2 +1,1 @@
-from .Secret import Secret
-from .Metadata import Metadata
+from .keyfort import Secret, Version, Metadata

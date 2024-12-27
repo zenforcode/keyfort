@@ -1,26 +1,13 @@
-from typing import Type
+from typing import Type, Optional, Tuple
 from copy import deepcopy
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field, UUID4
 
-from models import Secret
-
+from keyfort.models import Secret, Version, Metadata
+from keyfort.repository import SecretRepository
 
 app = FastAPI()
-
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-IN_MEMORY_DB = dict()
-
-
-class NotFoundException(Exception):
-    def __init__(self):
-        super().__init__("Secret with provided ID does not exist")
 
 
 class NotCreatedException(Exception):
@@ -28,60 +15,11 @@ class NotCreatedException(Exception):
         super().__init__("Error creating secret")
 
 
-class SecretRepository:
-    def getSecretOrEexception(self, id):
-        secret = IN_MEMORY_DB.get(id)
-        if not secret:
-            raise NotFoundException()
-
-        return deepcopy(secret)
-
-    def insertSecret(self, secret: str) -> Type[Secret]:
-        try:
-            newSecret = Secret(secret)
-            IN_MEMORY_DB[newSecret.id] = newSecret
-
-            return self.getSecretOrEexception(newSecret.id)
-        except NotFoundException:
-            raise NotCreatedException()
-
-    def getSecret(self, id: UUID4, meta: bool = False):
-        try:
-            secret = self.getSecretOrEexception(id)
-            if meta:
-                return secret
-            return secret.removeMeta()
-
-        except NotFoundException as err:
-            raise err
-
-    def getSecretInfo(self, id: UUID4):
-        pass
-
-    def updateSecret(self, id: UUID4, secret: str):
-        try:
-            oldSecret = self.getSecretOrEexception(id)
-            IN_MEMORY_DB[id] = oldSecret.updateSecret(secret)
-            return self.getSecretOrEexception(id)
-        except NotFoundException as err:
-            raise err
-
-    def invalidateSecret(self, id: UUID4):
-        try:
-            secret = self.getSecretOrEexception(id)
-            secret.deactivate()
-            IN_MEMORY_DB[secret.id] = secret
-            return "OK"
-        except NotFoundException as err:
-            raise err
-
-
+# TODO: is there anyway to inject?
 secretRepository = SecretRepository()
 
-
 class CreateSecretResponse(BaseModel):
-    id: UUID4
-    secret: str
+    secret: Secret
 
 
 class CreateSecretPayload(BaseModel):
@@ -91,7 +29,12 @@ class CreateSecretPayload(BaseModel):
 @app.post("/secret")
 def create_secret(payload: CreateSecretPayload):
     try:
-        return secretRepository.insertSecret(payload.secret)
+        if secretRepository.exists(payload.secret):
+            raise HTTPException(status_code=400, detail="The secret exists")
+        else:
+            inserted_secret = secretRepository.insert_secret(secret_id=payload.secret.secret_id, value=payload.secret.value, metadata=payload.secret.metadata)
+            if not inserted_secret:
+                raise HTTPException(status_code=400, detail="Insertion failed")
     except NotCreatedException:
         raise HTTPException(status_code=404, detail="Could not create secret")
 
@@ -101,8 +44,7 @@ def get_secret(id: UUID4, meta: bool = False):
     try:
         return secretRepository.getSecret(id, meta)
     except NotFoundException:
-        raise HTTPException(
-            status_code=404, detail="Could not retreive secret")
+        raise HTTPException(status_code=404, detail="Could not retreive secret")
 
 
 @app.get("/secret/{id}/info")
@@ -111,7 +53,8 @@ def get_secret_info(id: UUID4):
         return secretRepository.getSecretInfo(id)
     except NotFoundException:
         raise HTTPException(
-            status_code=404, detail="Could not retreive metadata for secret")
+            status_code=404, detail="Could not retreive metadata for secret"
+        )
 
 
 class UpdateSecretPayload(BaseModel):
@@ -124,8 +67,7 @@ def update_secret_meta(id: UUID4, payload: UpdateSecretPayload):
     try:
         return secretRepository.updateSecret(id, payload.secret)
     except NotFoundException:
-        raise HTTPException(
-            status_code=404, detail="Could not retreive secret")
+        raise HTTPException(status_code=404, detail="Could not retreive secret")
 
 
 @app.delete("/secret/invalidate/{id}")
@@ -133,5 +75,4 @@ def invalidate_secret(id: UUID4):
     try:
         return secretRepository.invalidateSecret(id)
     except NotFoundException:
-        raise HTTPException(
-            status_code=404, detail="Could not retreive secret")
+        raise HTTPException(status_code=404, detail="Could not retreive secret")
