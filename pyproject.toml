@@ -1,7 +1,7 @@
 [project]
 name = "keyfort"
 version = "0.1.0"
-description = "Add your description here"
+description = "KeyFort is a secure, centralized solution for managing and storing sensitive data such as API keys, credentials, tokens, and other secrets."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []
