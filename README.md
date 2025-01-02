@@ -14,7 +14,7 @@ The KeyFort Server is a secure, centralized solution for managing and storing se
 Before setting up the KeyVault Server, ensure the following:
 - **Operating System**: Linux (preferred), macOS, or Windows.
 - **Dependencies**:
-  - Python 3.8+
+  - Python 3.11+
   - FoundationDB (for backend storage)
 
 ## Installation
@@ -43,14 +43,10 @@ Before setting up the KeyVault Server, ensure the following:
      - Secret key for encryption
      - Other environment variables
 
-5. **Run database migrations** (if applicable):
-   ```bash
-   python manage.py migrate
-   ```
 
-6. **Start the server**:
+5. **Start the server**:
    ```bash
-   python manage.py runserver
+   make run
    ```
 
 ## Configuration
@@ -88,15 +84,15 @@ curl -X DELETE http://localhost:5000/secrets/api-key
 ## Testing
 Run unit tests to ensure the application is functioning as expected:
 ```bash
-pytest
+make test
 ```
 
 ## Contributing
 We welcome contributions! To contribute:
 1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature-name`).
+2. Create a feature branch (`git checkout -b feature/name`).
 3. Commit your changes (`git commit -m 'Add feature'`).
-4. Push to the branch (`git push origin feature-name`).
+4. Push to the branch (`git push origin feature/name`).
 5. Open a pull request.
 
 ## License
