@@ -12,7 +12,6 @@ class NotCreatedException(Exception):
     def __init__(self):
         super().__init__("Error creating secret")
 
-
 class SecretRepository:
     """Secret repository"""
 
@@ -71,7 +70,7 @@ class SecretRepository:
             return secret_data.metadata
         return None
 
-    def get_secret_meta(self, secret: str, meta: bool = False) -> Optional[Secret]:
+    def get_secret_meta(self, secret: str, meta: bool = True) -> Optional[Secret]:
         """Get secret with or without metadata
 
         Args:
