@@ -6,6 +6,7 @@ from copy import deepcopy
 from datetime import datetime
 
 import rocksdb
+import msgpack
 
 IN_MEMORY_DB = rocksdb.DB("keystore.db", rocksdb.Options(create_if_missing=True))
 
@@ -27,7 +28,8 @@ class SecretRepository:
         Returns:
             Tuple[bool, Optional[Secret]]: Tuple that indicates whether there is an error or not.
         """
-        secret_data = IN_MEMORY_DB.get(secret.encode())
+        secret_data_binary = IN_MEMORY_DB.get(secret.encode())
+        secret_data = msgpack.unpackb(secret_data_binary, raw=False)
         if not secret_data:
             return False, None
         return True, deepcopy(secret_data)
@@ -52,7 +54,7 @@ class SecretRepository:
         last_modified = now.strftime("%d%m%Y%H%M%S")
         version = Version(version_number=0, description="", last_modified=last_modified)
         newSecret = Secret(name=secret, value=value, version=version, metadata=metadata)
-        IN_MEMORY_DB[secret] = newSecret
+        IN_MEMORY_DB.put(secret.encode(), msgpack.packb(newSecret.model_dump()))
         return secret
 
     def get_secret_info(self, secret: str) -> Optional[Metadata]:
@@ -101,8 +103,17 @@ class SecretRepository:
         if error:
             return True, "Not Found"
         else:
-            secret_data.version = secret_data.version + 1
-            IN_MEMORY_DB[old_secret] = secret_data
+            now = datetime.now()
+            last_modified = now.strftime("%d%m%Y%H%M%S")
+            version = Version(
+                version_number=secret_data.version + 1,
+                description=secret_data.description,
+                last_modified=last_modified,
+            )
+            secret_data.version = version
+            IN_MEMORY_DB.put(
+                old_secret.encode(), msgpack.packb(secret_data.model_dump())
+            )
         return False, "OK"
 
     def invalidate_secret(self, secret: str) -> Tuple[bool, str]:

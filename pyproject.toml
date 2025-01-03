@@ -8,6 +8,7 @@ dependencies = [
     "coverage>=7.6.10",
     "fastapi-versioning>=0.10.0",
     "fastapi[standard]>=0.115.6",
+    "msgpack>=1.1.0",
     "pytest>=8.3.4",
     "ruff>=0.8.5",
 ]
