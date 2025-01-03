@@ -29,7 +29,7 @@ class SecretRepository:
             if not secret_data_binary:
                 return True, None
             secret_data = msgpack.unpackb(secret_data_binary, raw=False)
-            return False, secret_data
+            return False, Secret(**secret_data)
         return True, None
 
     def insert_secret(
@@ -86,7 +86,7 @@ class SecretRepository:
             return None
         if not meta:
             secret_data.metadata = None
-        return Secret(**secret_data)
+        return secret_data
 
     def update_secret(self, old_secret: str, secret_data: Secret) -> Tuple[bool, str]:
         """Update secret with a new one
@@ -102,17 +102,16 @@ class SecretRepository:
         if error:
             return True, "Not Found"
         else:
-            secret_value = Secret(**secret_data)
             now = datetime.now()
             last_modified = now.strftime("%d%m%Y%H%M%S")
             version = Version(
-                version_number=secret_value.version.version_number + 1,
-                description=secret_value.description,
+                version_number=secret_data.version.version_number + 1,
+                description=secret_data.description,
                 last_modified=last_modified,
             )
-            secret_value.version = version
+            secret_data.version = version
             with open_db("secretstore.db", flag="c", mode=0o666) as db:
-                db.update(old_secret.encode(), msgpack.packb(secret_value.model_dump()))
+                db.update(old_secret.encode(), msgpack.packb(secret_data.model_dump()))
         return False, "OK"
 
     def invalidate_secret(self, secret: str) -> Tuple[bool, str]:
@@ -126,10 +125,9 @@ class SecretRepository:
         """
         err, secret_data = self.get_secret(secret)
         if err:
-            return False, "Not Found"
+            return True, "Not Found"
         else:
-            secret_value = Secret(**secret_data)
-            secret_value.metadata.is_active = True
+            secret_data.metadata.is_active = True
             with open_db("secretstore.db", flag="w", mode=0o666) as db:
-                db.update(secret.encode(), msgpack.packb(secret_value.model_dump()))
-            return True, "OK"
+                db.update(secret.encode(), msgpack.packb(secret_data.model_dump()))
+            return False, "OK"

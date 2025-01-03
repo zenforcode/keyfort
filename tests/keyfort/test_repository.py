@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 from keyfort.models import Secret, Metadata, Version
 from datetime import datetime
 import msgpack
@@ -45,7 +45,7 @@ def test_get_secret_success(mock_db, secret_repo, test_secret, test_fake_db):
     mock_db.return_value = test_fake_db
     error, secret = secret_repo.get_secret(test_secret.name)
     assert error is False
-    assert secret['name'] == test_secret.name
+    assert secret.name == test_secret.name
 
 @patch('keyfort.repository.open_db')
 def test_get_secret_not_found(mock_db, secret_repo, test_fake_db):
@@ -64,13 +64,14 @@ def test_insert_secret(mock_db, secret_repo, test_secret, test_fake_db):
         test_secret.metadata
     )
     item = secret_repo.get_secret(test_secret.name)
-    assert result == item[1]['name']
+    assert result == item[1].name
     assert result == test_secret.name
 
 @patch('keyfort.repository.open_db')
 def test_get_secret_meta(mock_db, secret_repo, test_secret, test_fake_db):
     mock_db.return_value = test_fake_db
-    metadata = secret_repo.get_secret_meta(test_secret.name)
+    secret= secret_repo.get_secret_meta(test_secret.name)
+    
 
 @patch('keyfort.repository.open_db')
 def test_update_secret(mock_db, secret_repo, test_secret, test_fake_db):
@@ -80,25 +81,17 @@ def test_update_secret(mock_db, secret_repo, test_secret, test_fake_db):
     error, message = secret_repo.update_secret(test_secret.name, updated_secret)
     assert error is False
     assert message == "OK"
-"""
-@patch('keyfort_repository.open_db')
-def test_invalidate_secret(mock_db, secret_repo, test_secret):
-    mock_db.get.return_value = msgpack.packb(test_secret.model_dump())
-    mock_db.put = MagicMock()
-
-    success, message = secret_repo.invalidate_secret(test_secret.name)
-
-    assert success is True
-    assert message == "OK"
-    mock_db.put.assert_called_once()
 
 @patch('keyfort.repository.open_db')
-def test_invalidate_secret_not_found(mock_db, secret_repo):
-    mock_db.get.return_value = None
+def test_invalidate_secret(mock_db, secret_repo, test_secret, test_fake_db):
+    mock_db.return_value = test_fake_db
+    error, message = secret_repo.invalidate_secret(test_secret.name)
+    assert error is False
+    assert message == "OK"
 
-    success, message = secret_repo.invalidate_secret("nonexistent_secret")
-
-    assert success is False
+@patch('keyfort.repository.open_db')
+def test_invalidate_secret_not_found(mock_db, secret_repo, test_fake_db):
+    mock_db.return_value = test_fake_db
+    error, message = secret_repo.invalidate_secret("nonexistent_secret")
+    assert error is True
     assert message == "Not Found"
-    mock_db.get.assert_called_with("nonexistent_secret".encode())
-"""
