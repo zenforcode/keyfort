@@ -1,8 +1,11 @@
 lint:
-	@uv ruff check keyfort
+	@uv run ruff check keyfort
+lint-fix:
+	@uv run ruff check --fix
 build: lint
 	@uv build
 format:
+	@uv run ruff check --fix
 	@uv run ruff format keyfort
 test:
 	uv run coverage run -m pytest ./tests

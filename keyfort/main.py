@@ -1,13 +1,10 @@
-from typing import Type, Optional, Tuple, NoReturn
-from copy import deepcopy
+from typing import NoReturn
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field, UUID4
+from pydantic import UUID4
 
 from keyfort.models import (
     Secret,
-    Version,
-    Metadata,
     CreateSecretPayload,
     UpdateSecretPayload,
 )
