@@ -90,7 +90,9 @@ class SecretRepository:
             secret.meta = None
         return secret
 
-    def update_secret(self, old_secret: Secret, secret: Secret) -> Tuple[bool, str]:
+    def update_secret_by_id(
+        self, old_secret_id: str, secret: Secret
+    ) -> Tuple[bool, str]:
         """Update secret with a new one
 
         Args:
@@ -100,7 +102,7 @@ class SecretRepository:
         Returns:
             bool: False in case of error.
         """
-        error, secret_id = self.get_secret(old_secret.secret_id)
+        error, secret_id = self.get_secret(old_secret_id)
         if error:
             return True, "Not Found"
         else:

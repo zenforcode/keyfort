@@ -1,13 +1,9 @@
-from typing import Type, Optional, Tuple, NoReturn
-from copy import deepcopy
+from typing import NoReturn
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, Field, UUID4
 
 from keyfort.models import (
     Secret,
-    Version,
-    Metadata,
     CreateSecretPayload,
     UpdateSecretPayload,
 )
@@ -38,7 +34,7 @@ def create_secret(payload: CreateSecretPayload):
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@app.get("/secret/{id}")
+@app.get("/secret/{secret_id}")
 def get_secret(secret_id: str, meta: bool = False):
     secret = secretRepository.get_secret_meta(secret_id=secret_id, meta=meta)
     if secret:
@@ -47,7 +43,7 @@ def get_secret(secret_id: str, meta: bool = False):
         raise HTTPException(status_code=404, detail="Could not retreive secret")
 
 
-@app.get("/secret/{id}/info")
+@app.get("/secret/{secret_id}/info")
 def get_secret_info(secret_id: str) -> Secret | NoReturn:
     err, secret = secretRepository.get_secret(secret_id=secret_id)
     if err:
@@ -57,18 +53,17 @@ def get_secret_info(secret_id: str) -> Secret | NoReturn:
     return secret
 
 
-@app.put("/meta/update/{id}")
-def update_secret_meta(id: UUID4, payload: UpdateSecretPayload):
-    print(id)
-    try:
-        return secretRepository.updateSecret(id, payload.secret)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Could not retreive secret")
+@app.put("/meta/update/{secret_id}")
+def update_secret_meta(secret_id: str, payload: UpdateSecretPayload):
+    err, res = secretRepository.update_secret_by_id(secret_id, payload)
+    if err:
+        raise HTTPException(status_code=404, detail=res)
+    return res
 
 
-@app.delete("/secret/invalidate/{id}")
-def invalidate_secret(id: UUID4):
-    try:
-        return secretRepository.invalidateSecret(id)
-    except NotFoundException:
-        raise HTTPException(status_code=404, detail="Could not retreive secret")
+@app.delete("/secret/invalidate/{secret_id}")
+def invalidate_secret(secret_id: str):
+    err, res = secretRepository.invalidate_secret(secret_id)
+    if err:
+        raise HTTPException(status_code=404, detail=res)
+    return res
