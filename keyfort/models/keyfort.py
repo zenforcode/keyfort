@@ -46,4 +46,5 @@ class CreateSecretPayload(BaseModel):
 
 
 class UpdateSecretPayload(BaseModel):
-    secret: str
+    secret: Secret
+    new_secret: Secret

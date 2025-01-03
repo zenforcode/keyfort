@@ -1,6 +1,6 @@
 lint:
 	@uv run ruff check keyfort
-lint-fix:
+checks:
 	@uv run ruff check --fix
 build: lint
 	@uv build
