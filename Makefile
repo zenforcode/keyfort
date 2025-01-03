@@ -1,5 +1,5 @@
 lint:
-	@ruff check keyfort
+	@uv ruff check keyfort
 build: lint
 	@uv build
 format:
