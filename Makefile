@@ -2,7 +2,7 @@ lint:
 	@uv run ruff check src/keyfort
 checks:
 	@uv run ruff check --fix
-build: lint
+build: lint test
 	@uv build
 format:
 	@uv run ruff check --fix src
