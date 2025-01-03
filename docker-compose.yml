@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  atr_service:
+    image: artifactory.zenforcode.com/keyfort:latest
+    container_name: keyfort_container
+    ports:
+      - "8080:8080" # Map port 8080 on the host to port 8080 in the container
+    volumes:
+      - ./data:/app/data # Map a local directory to a directory in the container
+    restart: unless-stopped
+    networks:
+      - keyfort_network
+  cryptoserver:
+    image: artifactory.zenforcode.com/cryptoserver:latest
+    container_name: cryptoserver_container
+    ports:
+      - "9090:9090" # Map port 9090 on the host to port 9090 in the container
+    volumes:
+      - ./crypto_data:/crypto/data # Map a local directory to a directory in the container
+    restart: unless-stopped
+    networks:
+      - keyfort_network
+
+  foundation_db:
+    image: foundationdb:latest
+    container_name: foundationdb_container
+    ports:
+      - "15000:15000" # Map port 15000 on the host to port 15000 in the container
+    volumes:
+      - ./fdb_data:/foundationdb/data # Map a local directory to a directory in the container
+    restart: unless-stopped
+    networks:
+      - keyfort_network
+networks:
+  keyfort_network:
+    driver: bridge

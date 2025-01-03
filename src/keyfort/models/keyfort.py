@@ -5,9 +5,9 @@ from pydantic import BaseModel, Field
 class Metadata(BaseModel):
     """Data model that implements the metadata for a secret."""
 
-    created_at: str
-    updated_at: str
-    is_active: bool
+    created_at: str = ""
+    updated_at: str = ""
+    is_active: bool = False
     description: Optional[str] = ""
 
 
@@ -28,7 +28,7 @@ class Version(BaseModel):
 class Secret(BaseModel):
     """Model that contains the secret."""
 
-    secret_id: str
+    name: str
     value: str
     version: Version
     description: Optional[str] = ""
