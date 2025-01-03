@@ -4,11 +4,8 @@ from typing import Tuple, Optional, NoReturn
 from keyfort.models import Secret, Metadata, Version
 from copy import deepcopy
 from datetime import datetime
-
-import rocksdb
+from dbm import open as open_db
 import msgpack
-
-IN_MEMORY_DB = rocksdb.DB("keystore.db", rocksdb.Options(create_if_missing=True))
 
 
 class NotCreatedException(Exception):
@@ -28,11 +25,13 @@ class SecretRepository:
         Returns:
             Tuple[bool, Optional[Secret]]: Tuple that indicates whether there is an error or not.
         """
-        secret_data_binary = IN_MEMORY_DB.get(secret.encode())
-        secret_data = msgpack.unpackb(secret_data_binary, raw=False)
-        if not secret_data:
-            return False, None
-        return True, deepcopy(secret_data)
+        with open_db("secretstore.db", flag="c", mode=0o666) as db:
+            secret_data_binary = db.get(secret.encode())
+            if not secret_data_binary:
+                return False, None
+            secret_data = msgpack.unpackb(secret_data_binary, raw=False)
+            return True, deepcopy(secret_data)
+        return False, None
 
     def insert_secret(
         self, secret: str, value: str, metadata: Optional[Metadata]
@@ -54,7 +53,8 @@ class SecretRepository:
         last_modified = now.strftime("%d%m%Y%H%M%S")
         version = Version(version_number=0, description="", last_modified=last_modified)
         newSecret = Secret(name=secret, value=value, version=version, metadata=metadata)
-        IN_MEMORY_DB.put(secret.encode(), msgpack.packb(newSecret.model_dump()))
+        with open_db("secretstore.db", flag="c", mode=0o666) as db:
+            db.update(secret.encode(), msgpack.packb(newSecret.model_dump()))
         return secret
 
     def get_secret_info(self, secret: str) -> Optional[Metadata]:
@@ -111,9 +111,8 @@ class SecretRepository:
                 last_modified=last_modified,
             )
             secret_data.version = version
-            IN_MEMORY_DB.put(
-                old_secret.encode(), msgpack.packb(secret_data.model_dump())
-            )
+            with open_db("secretstore.db", flag="c", mode=0o666) as db:
+                db.update(old_secret.encode(), msgpack.packb(secret_data.model_dump()))
         return False, "OK"
 
     def invalidate_secret(self, secret: str) -> Tuple[bool, str]:
@@ -130,5 +129,6 @@ class SecretRepository:
             return False, "Not Found"
         else:
             secret_data.metadata.is_active = True
-            IN_MEMORY_DB[secret] = secret_data
+            with open_db("secretstore.db", flag="w", mode=0o666) as db:
+                db.update(secret.encode(), msgpack.packb(secret_data.model_dump()))
             return True, "OK"
