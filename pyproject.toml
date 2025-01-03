@@ -3,7 +3,7 @@ name = "keyfort"
 version = "0.1.0"
 description = "KeyFort is a secure, centralized solution for managing and storing sensitive data such as API keys, credentials, tokens, and other secrets."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10,<3.12"
 dependencies = [
     "coverage>=7.6.10",
     "fastapi-versioning>=0.10.0",

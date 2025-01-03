@@ -5,7 +5,9 @@ from keyfort.models import Secret, Metadata, Version
 from copy import deepcopy
 from datetime import datetime
 
-IN_MEMORY_DB = dict()
+import rocksdb
+
+IN_MEMORY_DB = rocksdb.DB("keystore.db", rocksdb.Options(create_if_missing=True))
 
 
 class NotCreatedException(Exception):
@@ -25,8 +27,7 @@ class SecretRepository:
         Returns:
             Tuple[bool, Optional[Secret]]: Tuple that indicates whether there is an error or not.
         """
-        secret_data = IN_MEMORY_DB.get(secret)
-        print(IN_MEMORY_DB)
+        secret_data = IN_MEMORY_DB.get(secret.encode())
         if not secret_data:
             return False, None
         return True, deepcopy(secret_data)
