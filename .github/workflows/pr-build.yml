@@ -27,13 +27,6 @@ jobs:
           source .venv/bin/activate
           uv sync
 
-      # Set up Rust environment
-      - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          
       - name: Build the code.
         run: |
           make build
