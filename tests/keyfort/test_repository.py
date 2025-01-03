@@ -26,7 +26,7 @@ def secret_repo():
 
 @pytest.fixture
 def test_secret():
-    metadata = Metadata(created_at=str(datetime.now()), is_active=True)
+    metadata = Metadata(created_at=str(datetime.now()), description="test_meta", is_active=True)
     return Secret(
         name="test_secret",
         value="test_value",
@@ -46,6 +46,13 @@ def test_get_secret_success(mock_db, secret_repo, test_secret, test_fake_db):
     error, secret = secret_repo.get_secret(test_secret.name)
     assert error is False
     assert secret.name == test_secret.name
+
+@patch('keyfort.repository.open_db')
+def test_get_secret_info(mock_db, secret_repo, test_secret, test_fake_db):
+    mock_db.return_value = test_fake_db
+    meta = secret_repo.get_secret_info(test_secret.name)
+    assert meta
+    assert meta.description == "test_meta"
 
 @patch('keyfort.repository.open_db')
 def test_get_secret_not_found(mock_db, secret_repo, test_fake_db):

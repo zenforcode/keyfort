@@ -65,9 +65,9 @@ class SecretRepository:
         Returns:
             Optional[Metadata]: Secret matadata.
         """
-        secret_data = self.get_secret_meta(secret=secret)
+        secret_data = self.get_secret_meta(secret=secret, meta=True)
         if secret_data:
-            return Secret(*secret_data).metadata
+            return secret_data.metadata
         return None
 
     def get_secret_meta(self, secret: str, meta: bool = True) -> Optional[Secret]:
