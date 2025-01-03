@@ -45,7 +45,7 @@ def test_get_secret_not_found(mock_db, secret_repo):
     assert secret is None
     mock_db.get.assert_called_with("nonexistent_secret".encode())
 
-@patch('keyfort.repositiry.IN_MEMORY_DB')
+@patch('keyfort.repository.IN_MEMORY_DB')
 def test_insert_secret(mock_db, secret_repo, test_secret):
     # Mock the database
     mock_db.put = MagicMock()
@@ -59,7 +59,7 @@ def test_insert_secret(mock_db, secret_repo, test_secret):
     assert result == test_secret.name
     mock_db.put.assert_called_once()
 
-@patch('your_module.IN_MEMORY_DB')
+@patch('keyfort.repository.IN_MEMORY_DB')
 def test_get_secret_info(mock_db, secret_repo, test_secret):
     mock_db.get.return_value = msgpack.packb(test_secret.model_dump())
 
@@ -68,7 +68,7 @@ def test_get_secret_info(mock_db, secret_repo, test_secret):
     assert metadata.is_active is True
     mock_db.get.assert_called_with(test_secret.name.encode())
 
-@patch('your_module.IN_MEMORY_DB')
+@patch('keyfort.repository.IN_MEMORY_DB')
 def test_update_secret(mock_db, secret_repo, test_secret):
     # Mock the database
     mock_db.get.return_value = msgpack.packb(test_secret.model_dump())
@@ -83,7 +83,7 @@ def test_update_secret(mock_db, secret_repo, test_secret):
     assert message == "OK"
     mock_db.put.assert_called_once()
 
-@patch('your_module.IN_MEMORY_DB')
+@patch('keyfort_repository.IN_MEMORY_DB')
 def test_invalidate_secret(mock_db, secret_repo, test_secret):
     mock_db.get.return_value = msgpack.packb(test_secret.model_dump())
     mock_db.put = MagicMock()
@@ -94,7 +94,7 @@ def test_invalidate_secret(mock_db, secret_repo, test_secret):
     assert message == "OK"
     mock_db.put.assert_called_once()
 
-@patch('your_module.IN_MEMORY_DB')
+@patch('keyfort.repository.IN_MEMORY_DB')
 def test_invalidate_secret_not_found(mock_db, secret_repo):
     mock_db.get.return_value = None
 
