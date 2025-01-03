@@ -2,46 +2,106 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# KeyFort: A secret storage
 
-Let's discover **Docusaurus in less than 5 minutes**.
+## Overview
+The KeyFort Server is a secure, centralized solution for managing and storing sensitive data such as API keys, credentials, tokens, and other secrets. This server is designed with encryption, access control, and auditing features to ensure data security and compliance with industry standards.
 
-## Getting Started
+## Features
+- **Secure Storage**: Encrypts all stored data with robust encryption algorithms.
+- **Access Control**: Role-based access control (RBAC) for managing user permissions.
+- **Audit Logs**: Tracks and records all actions and access events for security auditing.
+- **API Access**: Provides a RESTful API for integration with applications and services.
+- **Versioning**: Maintains version history of secrets for rollback and audit purposes.
+- **Expirable Secrets**: Supports time-limited secrets that automatically expire after a set duration.
 
-Get started by **creating a new site**.
+## Prerequisites
+Before setting up the KeyVault Server, ensure the following:
+- **Operating System**: Linux (preferred), macOS, or Windows.
+- **Dependencies**:
+  - Python 3.11+
+  - FoundationDB (for backend storage)
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+## Installation
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/zenforcode/keyfort
+   cd keyfort
+   ```
 
-### What you'll need
+2. **Set up a virtual environment**:
+   ```bash
+   pip install uv
+   uv venv
+   source .venv/bin/activate
+   ```
 
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
+3. **Install dependencies**:
+   ```bash
+   uv sync
+   ```
 
-## Generate a new site
+4. **Configure the environment**:
+   - Copy the `.env.example` file and rename it to `.env`.
+   - Update the configuration in `.env`:
+     - Database connection string
+     - Secret key for encryption
+     - Other environment variables
 
-Generate a new Docusaurus site using the **classic template**.
 
-The classic template will automatically be added to your project after you run the command:
+5. **Start the server**:
+   ```bash
+   make run
+   ```
 
+## Configuration
+All configurations are managed through the `.env` file. Key settings include:
+- `DB_CONNECTION`: Database connection string (e.g., `mongodb://localhost:27017/keyvault` or `postgresql://user:password@localhost/keyvault`)
+- `TOKEN_API_KEY`: Encryption key for securing data.
+- `API_PORT`: Port number for the server.
+- `LOG_LEVEL`: Logging verbosity (e.g., DEBUG, INFO, WARNING).
+
+## Usage
+### Adding a Secret
+To add a secret, use the `/secrets` API endpoint:
 ```bash
-npm init docusaurus@latest my-website classic
+curl -X POST -H "Content-Type: application/json" -d '{"key": "api-key", "value": "12345"}' http://localhost:8080/secrets
 ```
 
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
+### Retrieving a Secret
+To retrieve a secret, use the `/secrets/{key}` endpoint:
 ```bash
-cd my-website
-npm run start
+curl -X GET http://localhost:8080/secrets/yoursecret
 ```
 
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
+### Deleting a Secret
+To delete a secret, use the `/secrets/{key}` endpoint:
+```bash
+curl -X DELETE http://localhost:8080/secrets/api-key
+```
 
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
+## Security
+- **Encryption**: All secrets are encrypted at rest using AES-256.
+- **Authentication**: Supports API key or JWT-based authentication for API access.
+- **Authorization**: Role-based access control ensures only authorized users can perform specific actions.
+- **Auditing**: All actions are logged for monitoring and auditing purposes.
 
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+## Testing
+Run unit tests to ensure the application is functioning as expected:
+```bash
+make test
+```
+
+## Contributing
+We welcome contributions! To contribute:
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/name`).
+3. Commit your changes (`git commit -m 'Add feature'`).
+4. Push to the branch (`git push origin feature/name`).
+5. Open a pull request.
+
+## License
+This project is licensed under the MIT License. See the `LICENSE` file for details.
+
+## Contact
+For questions or support, contact the maintainer at [team@zenforcode.com](mailto:team@zenforcode.com).
