@@ -12,7 +12,7 @@ test:
 run:
 	@.venv/bin/fastapi run keyfort/main.py --port 80 --host 0.0.0.0
 docker-build-local:
-	docker build . -t 
+	docker build . -t artifactory.keyfort.zenforcode.com:latest
 
 docker-build-aws:
 	./scripts/build_aws_docker.sh
