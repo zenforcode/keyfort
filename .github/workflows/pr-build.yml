@@ -33,11 +33,7 @@ jobs:
         with:
           toolchain: stable
           override: true
-
-      - name: Install Rust dependencies
-        run: |
-          rustup update
-          cargo fetch
+          
       - name: Build the code.
         run: |
           make build
