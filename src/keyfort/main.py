@@ -24,7 +24,7 @@ secretRepository = SecretRepository()
 def create_secret(payload: CreateSecretPayload):
     try:
         inserted_secret: Secret = secretRepository.insert_secret(
-            secret_id=payload.secret, value=payload.value, metadata=payload.metadata
+            secret=payload.secret, value=payload.value, metadata=payload.metadata
         )
         if not inserted_secret:
             raise HTTPException(
@@ -35,11 +35,11 @@ def create_secret(payload: CreateSecretPayload):
         raise HTTPException(status_code=400, detail=f"Insertion failed: {str(e)}")
 
 
-@app.get("/secret/{secret_id}")
+@app.get("/secret/{secret}")
 @version(1)
-def get_secret(secret_id: str, meta: bool = False) -> Secret:
+def get_secret(secret: str, meta: bool = False) -> Secret:
     try:
-        secret = secretRepository.get_secret_meta(secret_id=secret_id, meta=meta)
+        secret = secretRepository.get_secret_meta(secret=secret, meta=meta)
         if not secret:
             raise HTTPException(status_code=404, detail="Secret not found.")
         return secret
@@ -47,11 +47,11 @@ def get_secret(secret_id: str, meta: bool = False) -> Secret:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 
-@app.get("/secret/{secret_id}/info")
+@app.get("/secret/{secret}/info")
 @version(1)
-def get_secret_info(secret_id: str) -> Secret:
+def get_secret_info(secret: str) -> Secret:
     try:
-        err, secret = secretRepository.get_secret(secret_id=secret_id)
+        err, secret = secretRepository.get_secret(secret_id=secret)
         if err or not secret:
             raise HTTPException(
                 status_code=404, detail="Could not retrieve metadata for secret."
@@ -61,11 +61,11 @@ def get_secret_info(secret_id: str) -> Secret:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 
-@app.put("/secret/{secret_id}/meta")
+@app.put("/secret/{secret}/meta")
 @version(1)
-def update_secret_meta(secret_id: str, payload: UpdateSecretPayload) -> Secret:
+def update_secret_meta(secret: str, payload: UpdateSecretPayload) -> Secret:
     try:
-        err, res = secretRepository.update_secret_by_id(secret_id, payload)
+        err, res = secretRepository.update_secret_by_id(secret, payload)
         if err:
             raise HTTPException(status_code=404, detail=res)
         return res
@@ -73,11 +73,11 @@ def update_secret_meta(secret_id: str, payload: UpdateSecretPayload) -> Secret:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 
-@app.delete("/secret/{secret_id}")
+@app.delete("/secret/{secret}")
 @version(1)
-def invalidate_secret(secret_id: str):
+def invalidate_secret(secret: str):
     try:
-        err, res = secretRepository.invalidate_secret(secret_id)
+        err, res = secretRepository.invalidate_secret(secret)
         if err:
             raise HTTPException(status_code=404, detail=res)
         return {"message": "Secret invalidated successfully.", "details": res}
