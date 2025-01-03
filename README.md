@@ -60,19 +60,19 @@ All configurations are managed through the `.env` file. Key settings include:
 ### Adding a Secret
 To add a secret, use the `/secrets` API endpoint:
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"key": "api-key", "value": "12345"}' http://localhost:5000/secrets
+curl -X POST -H "Content-Type: application/json" -d '{"key": "api-key", "value": "12345"}' http://localhost:8080/secrets
 ```
 
 ### Retrieving a Secret
 To retrieve a secret, use the `/secrets/{key}` endpoint:
 ```bash
-curl -X GET http://localhost:5000/secrets/api-key
+curl -X GET http://localhost:8080/secrets/yoursecret
 ```
 
 ### Deleting a Secret
 To delete a secret, use the `/secrets/{key}` endpoint:
 ```bash
-curl -X DELETE http://localhost:5000/secrets/api-key
+curl -X DELETE http://localhost:8080/secrets/api-key
 ```
 
 ## Security

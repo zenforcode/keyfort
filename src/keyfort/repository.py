@@ -1,7 +1,7 @@
 """Data Repository Pattern"""
 
 from typing import Tuple, Optional, NoReturn
-from models import Secret, Metadata, Version
+from keyfort.models import Secret, Metadata, Version
 from copy import deepcopy
 from datetime import datetime
 
