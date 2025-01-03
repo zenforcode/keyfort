@@ -2,7 +2,6 @@
 
 from typing import Tuple, Optional, NoReturn
 from keyfort.models import Secret, Metadata, Version
-from copy import deepcopy
 from datetime import datetime
 from dbm import open as open_db
 import msgpack
@@ -11,6 +10,7 @@ import msgpack
 class NotCreatedException(Exception):
     def __init__(self):
         super().__init__("Error creating secret")
+
 
 class SecretRepository:
     """Secret repository"""
@@ -27,10 +27,10 @@ class SecretRepository:
         with open_db("secretstore.db", flag="c", mode=0o666) as db:
             secret_data_binary = db.get(secret.encode())
             if not secret_data_binary:
-                return False, None
+                return True, None
             secret_data = msgpack.unpackb(secret_data_binary, raw=False)
-            return True, deepcopy(secret_data)
-        return False, None
+            return False, secret_data
+        return True, None
 
     def insert_secret(
         self, secret: str, value: str, metadata: Optional[Metadata]
@@ -67,7 +67,7 @@ class SecretRepository:
         """
         secret_data = self.get_secret_meta(secret=secret)
         if secret_data:
-            return secret_data.metadata
+            return Secret(*secret_data).metadata
         return None
 
     def get_secret_meta(self, secret: str, meta: bool = True) -> Optional[Secret]:
@@ -85,8 +85,8 @@ class SecretRepository:
         if error:
             return None
         if not meta:
-            secret_data.meta = None
-        return secret_data
+            secret_data.metadata = None
+        return Secret(**secret_data)
 
     def update_secret(self, old_secret: str, secret_data: Secret) -> Tuple[bool, str]:
         """Update secret with a new one
@@ -102,16 +102,17 @@ class SecretRepository:
         if error:
             return True, "Not Found"
         else:
+            secret_value = Secret(**secret_data)
             now = datetime.now()
             last_modified = now.strftime("%d%m%Y%H%M%S")
             version = Version(
-                version_number=secret_data.version + 1,
-                description=secret_data.description,
+                version_number=secret_value.version.version_number + 1,
+                description=secret_value.description,
                 last_modified=last_modified,
             )
-            secret_data.version = version
+            secret_value.version = version
             with open_db("secretstore.db", flag="c", mode=0o666) as db:
-                db.update(old_secret.encode(), msgpack.packb(secret_data.model_dump()))
+                db.update(old_secret.encode(), msgpack.packb(secret_value.model_dump()))
         return False, "OK"
 
     def invalidate_secret(self, secret: str) -> Tuple[bool, str]:
@@ -127,7 +128,8 @@ class SecretRepository:
         if err:
             return False, "Not Found"
         else:
-            secret_data.metadata.is_active = True
+            secret_value = Secret(**secret_data)
+            secret_value.metadata.is_active = True
             with open_db("secretstore.db", flag="w", mode=0o666) as db:
-                db.update(secret.encode(), msgpack.packb(secret_data.model_dump()))
+                db.update(secret.encode(), msgpack.packb(secret_value.model_dump()))
             return True, "OK"

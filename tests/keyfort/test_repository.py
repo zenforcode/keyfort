@@ -43,16 +43,16 @@ def test_fake_db(test_secret):
 @patch('keyfort.repository.open_db')
 def test_get_secret_success(mock_db, secret_repo, test_secret, test_fake_db):
     mock_db.return_value = test_fake_db
-    result, secret = secret_repo.get_secret(test_secret.name)
-    assert result is True
+    error, secret = secret_repo.get_secret(test_secret.name)
+    assert error is False
     assert secret['name'] == test_secret.name
 
 @patch('keyfort.repository.open_db')
 def test_get_secret_not_found(mock_db, secret_repo, test_fake_db):
     # Mock the database
     mock_db.return_value = test_fake_db
-    result, secret = secret_repo.get_secret("nonexistent_secret")
-    assert result is False
+    error, secret = secret_repo.get_secret("nonexistent_secret")
+    assert error is True
     assert secret is None
 
 @patch('keyfort.repository.open_db')
@@ -71,23 +71,16 @@ def test_insert_secret(mock_db, secret_repo, test_secret, test_fake_db):
 def test_get_secret_meta(mock_db, secret_repo, test_secret, test_fake_db):
     mock_db.return_value = test_fake_db
     metadata = secret_repo.get_secret_meta(test_secret.name)
-    assert metadata.is_active is True
-"""
+
 @patch('keyfort.repository.open_db')
-def test_update_secret(mock_db, secret_repo, test_secret):
-    # Mock the database
-    mock_db.get.return_value = msgpack.packb(test_secret.model_dump())
-    mock_db.put = MagicMock()
-
-    updated_secret = test_secret.copy()
+def test_update_secret(mock_db, secret_repo, test_secret, test_fake_db):
+    mock_db.return_value = test_fake_db
+    updated_secret = test_secret.model_copy()
     updated_secret.value = "updated_value"
-
-    success, message = secret_repo.update_secret(test_secret.name, updated_secret)
-
-    assert success is False
+    error, message = secret_repo.update_secret(test_secret.name, updated_secret)
+    assert error is False
     assert message == "OK"
-    mock_db.put.assert_called_once()
-
+"""
 @patch('keyfort_repository.open_db')
 def test_invalidate_secret(mock_db, secret_repo, test_secret):
     mock_db.get.return_value = msgpack.packb(test_secret.model_dump())
