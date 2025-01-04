@@ -1,8 +1,4 @@
-from .keyfort import (
-    Secret as Secret,
-    Version as Version,
-    Metadata as Metadata,
-    CreateSecretPayload as CreateSecretPayload,
-    CreateSecretResponse as CreateSecretResponse,
-    UpdateSecretPayload as UpdateSecretPayload,
-)
+from .Secret import Secret, SecretDTO
+from .Metadata import Metadata, MetadataDTO
+from .Version import Version, VersionDTO
+from .keyfort import CreateSecretPayload, UpdateSecretPayload
