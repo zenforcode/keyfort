@@ -64,6 +64,7 @@ def create_secret(payload: CreateSecretPayload) -> SecretDTO:
     
 def get_secret(secret_id: str, meta: bool) -> SecretDTO:
     secret = secretRepository.find(secret_id=secret_id, meta=meta)
+    print("secret meta=false:", secret)
 
     if secret:
         return secret.get_dto()

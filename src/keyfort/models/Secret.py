@@ -24,7 +24,7 @@ class Secret():
             value=self.value,
             version=self.version.get_dto(),
             description=self.description,
-            metadata=self.metadata.get_dto()
+            metadata=(self.metadata.get_dto() if self.metadata else None)
         )
 
 class SecretDTO(BaseModel):
@@ -32,4 +32,4 @@ class SecretDTO(BaseModel):
     value: str
     version: VersionDTO
     description: str
-    metadata: Optional[MetadataDTO]
+    metadata: Optional[MetadataDTO] = None
