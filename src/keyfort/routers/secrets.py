@@ -16,7 +16,7 @@ def create_secret(payload: CreateSecretPayload) -> SecretDTO:
     try:
         return secret_service.create_secret(payload)        
         
-    except NotCreatedException as e:
+    except NotCreatedException:
         raise HTTPException(status_code=404, detail="Could not create secret")
 
 

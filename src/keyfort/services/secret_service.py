@@ -1,6 +1,5 @@
 from uuid import uuid4
 from datetime import datetime
-from fastapi import HTTPException
 from typing import Optional
 
 from keyfort.models import (
