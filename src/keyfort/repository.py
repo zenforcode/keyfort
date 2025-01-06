@@ -5,7 +5,8 @@ from typing import Tuple, Dict, Optional, NoReturn
 from copy import deepcopy
 
 from keyfort.exceptions import (
-    NotCreatedException
+    NotCreatedException,
+    DuplicateEntityException
 )
 
 from keyfort.models import (
@@ -79,11 +80,15 @@ class InMemorySecretRepository(SecretRepository):
         self.IN_MEMORY_DB: Dict[str, Secret] = dict()
     
     def create(self, secret: Secret) -> Secret | NoReturn:
+        duplicate = self.IN_MEMORY_DB.get(secret.secret_id)
+        if duplicate:
+            raise DuplicateEntityException("Secred with provided ID already exist!")
+        
         self.IN_MEMORY_DB[secret.secret_id] = secret
-        secret = self.find(secret.secret_id)
-
-        if not secret:
+        inserted = self.find(secret.secret_id)
+        if not inserted:
             raise NotCreatedException()
+        
         return deepcopy(secret)
 
     def find(self, secret_id: str, meta: bool = True) -> Optional[Secret]:

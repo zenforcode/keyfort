@@ -9,5 +9,5 @@ class NotFoundException(Exception):
 
 
 class DuplicateEntityException(Exception):
-    def __init__(self):
-        super().__init__("Entity under provided name already exists")
+    def __init__(self, msg: str):
+        super().__init__("Duplicate entity error: {}".format(msg))

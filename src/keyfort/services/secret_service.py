@@ -1,6 +1,7 @@
 from uuid import uuid4
 from datetime import datetime
 from fastapi import HTTPException
+from typing import Optional
 
 from keyfort.models import (
     CreateSecretPayload,
@@ -51,47 +52,36 @@ def create_secret(payload: CreateSecretPayload) -> SecretDTO:
         metadata=metadata
     )
 
-    try:
-        inserted_secret: Secret = secretRepository.create(secret)
+    inserted_secret: Secret = secretRepository.create(secret)
 
-        if not inserted_secret:
-            raise HTTPException(status_code=400, detail="Insertion failed")
-        
-        return inserted_secret.get_dto()
-        
-    except NotCreatedException as e:
-        raise HTTPException(status_code=404, detail=str(e))
+    if not inserted_secret:
+        raise NotCreatedException()
     
-def get_secret(secret_id: str, meta: bool) -> SecretDTO:
+    return inserted_secret.get_dto()
+
+    
+def get_secret(secret_id: str, meta: bool = False) -> Optional[SecretDTO]:
     secret = secretRepository.find(secret_id=secret_id, meta=meta)
-    print("secret meta=false:", secret)
 
     if secret:
         return secret.get_dto()
-    else:
-        raise HTTPException(
-            status_code=404, detail="Could not retreive secret")
 
-def get_secret_info(secret_id: str) -> MetadataDTO:
+    return None
+
+def get_secret_info(secret_id: str) -> Optional[MetadataDTO]:
     secret = secretRepository.find(secret_id)
 
-    if not secret or not secret.metadata:
-        raise HTTPException(
-            status_code=404, detail="Could not retreive metadata for secret"
-        )
+    if secret:
+        return secret.metadata.get_dto()
 
-    metadata = secret.metadata
-    print("metadata:", metadata.get_dto())
-    return metadata.get_dto()
+    return None
 
-def update_secret_meta(secret_id: str, payload: UpdateSecretPayload):
+def update_secret_meta(secret_id: str, payload: UpdateSecretPayload) -> str:
     err, res = secretRepository.update(secret_id, payload.secret)
-    if err:
-        raise HTTPException(status_code=404, detail=res)
+
     return res
 
 def invalidate_secret(secret_id: str) -> str:
     err, res = secretRepository.delete(secret_id)
-    if err:
-        raise HTTPException(status_code=404, detail=res)
+
     return res
