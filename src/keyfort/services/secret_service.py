@@ -2,7 +2,7 @@ from uuid import uuid4
 from datetime import datetime
 from fastapi import HTTPException
 
-from ..models import (
+from keyfort.models import (
     CreateSecretPayload,
     UpdateSecretPayload,
     Secret,
@@ -12,11 +12,11 @@ from ..models import (
     MetadataDTO
 )
 
-from ..exceptions import (
+from keyfort.exceptions import (
     NotCreatedException,
 )
 
-from ..repository import (
+from keyfort.repository import (
     SecretRepository,
     InMemorySecretRepository,
     SQLSecretRepository
