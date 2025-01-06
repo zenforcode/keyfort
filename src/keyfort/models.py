@@ -56,10 +56,6 @@ class VersionDTO(BaseModel):
     description: Optional[str]
 
 
-from typing import Optional
-from pydantic import BaseModel
-
-
 class Secret():
     """Model that contains the secret."""
 
