@@ -29,19 +29,21 @@ class RepositoryTest(unittest.TestCase):
 
     def test_get_secret_success(self):
         # when
-        secret: SecretDTO = self.test_secret_service.get_secret(secret_id=self.SEEDED_SECRET_ID)
+        secret: SecretDTO = self.test_secret_service.get_secret(
+            secret_id=self.SEEDED_SECRET_ID)
 
         # then
         assert secret.value == "this is my secret"
 
     def test_get_secret_info_success(self):
         # when
-        secret: MetadataDTO = self.test_secret_service.get_secret_info(secret_id=self.SEEDED_SECRET_ID)
+        secret: MetadataDTO = self.test_secret_service.get_secret_info(
+            secret_id=self.SEEDED_SECRET_ID)
 
-        #then
+        # then
         assert secret is not None
         assert isinstance(secret, MetadataDTO)
-    
+
     def test_update_secret_meta_success(self):
         # given
         createSecretPayload = CreateSecretPayload(secret="test secret")
@@ -53,7 +55,7 @@ class RepositoryTest(unittest.TestCase):
             payload=UpdateSecretPayload(secret="updated secret")
         )
 
-        #then
+        # then
         assert secret == "OK"
 
     def test_update_secret_meta_failure(self):
@@ -63,7 +65,7 @@ class RepositoryTest(unittest.TestCase):
             payload=UpdateSecretPayload(secret="updated secret")
         )
 
-        #then
+        # then
         assert secret == "Not Found"
 
     def test_invalidate_secret_meta_success(self):
@@ -76,7 +78,7 @@ class RepositoryTest(unittest.TestCase):
             secret_id=created.secret_id
         )
 
-        #then
+        # then
         assert secret == "OK"
 
     def test_invalidate_secret_meta_failure(self):
@@ -85,7 +87,7 @@ class RepositoryTest(unittest.TestCase):
             secret_id=uuid4()
         )
 
-        #then
+        # then
         assert secret == "Not Found"
 
 
