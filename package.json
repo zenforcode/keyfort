@@ -12,7 +12,7 @@
     "fern:ts": "fern add fern-typescript-node-sdk --group sdk", 
     "fern:go": "fern add fern-go-sdk --group sdk",
     "fern:java": "fern add fern-java-sdk --group sdk",
-    "fern:all": "fern:ts && fern:go && fern:java",
+    "fern:all": "npm run fern:ts && npm run fern:go && npm run fern:java",
     "fern:gen": "fern generate --group sdk --local"
   },
   "keywords": [],
