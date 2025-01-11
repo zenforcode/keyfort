@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "fern:init": "fern init --openapi ./openapi.json",
+    "fern:init": "fern init --openapi ./openapi.json --org zenforcode",
     "fern:ts": "fern add fern-typescript-node-sdk --group sdk", 
     "fern:go": "fern add fern-go-sdk --group sdk",
     "fern:java": "fern add fern-java-sdk --group sdk",
