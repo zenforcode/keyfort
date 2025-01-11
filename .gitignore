@@ -6,6 +6,12 @@ __pycache__/
 # C extensions
 *.so
 
+# JS dependencies
+node_modules/
+
+# Fern
+fern/
+
 # NixOS env files
 .direnv
 flake.nix

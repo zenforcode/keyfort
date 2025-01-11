@@ -34,16 +34,16 @@ jobs:
           source .venv/bin/activate
           uv sync
 
-      - name: Test and fix linting.
+      - name: Install Node dependencies
         run: |
-          uv run ruff check src/keyfort
-          uv run ruff check --fix
-          uv run ruff format src
+          npm install
 
-      - name: Test.
+      - name: Export OpenAPI spec and generate SDK.
         run: |
-          uv run coverage run --source=./src -m pytest ./tests
-          uv run coverage report -m
+          uv run extract-openapi.py
+          npm run fern:init
+          npm run fern:all
+          npm run fern:gen
 
       - name: Build Docker image.
         run: |
