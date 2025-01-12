@@ -45,6 +45,12 @@ jobs:
           npm run fern:all
           npm run fern:gen
 
+      - name: Extract semver version.
+        run: |
+          ver=$(uv run dunamai from git --no-metadata --style semver)
+          echo "VERSION=${ver}" >> $GITHUB_ENV
+
       - name: Build Docker image.
         run: |
+          echo "${{ env.VERSION }}"
           docker build . -t artifactory.keyfort.zenforcode.com:latest
