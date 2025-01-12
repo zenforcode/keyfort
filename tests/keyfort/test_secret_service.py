@@ -1,4 +1,3 @@
-import unittest
 from uuid import uuid4
 from keyfort.models import (
     SecretDTO,  MetadataDTO, CreateSecretPayload, UpdateSecretPayload
@@ -6,18 +5,12 @@ from keyfort.models import (
 import keyfort.services.secret_service as SECRET_SERVICE
 
 
-class RepositoryTest(unittest.TestCase):
-    test_secret_service = None
-    SEEDED_SECRET_ID = None
-
-    @classmethod
-    def setUpClass(cls):
-        cls.test_secret_service = SECRET_SERVICE
-        secret_dto = CreateSecretPayload(secret="this is my secret")
-        created_secret = cls.test_secret_service.create_secret(secret_dto)
-        cls.SEEDED_SECRET_ID = created_secret.secret_id
-
-        return super().setUpClass()
+class TestRepository:
+    test_secret_service = SECRET_SERVICE
+    SEEDED_SECRET = test_secret_service.create_secret(
+        CreateSecretPayload(secret="this is my secret")
+    )
+    SEEDED_SECRET_ID = SEEDED_SECRET.secret_id
 
     def test_create_secret_success(self):
         # when
@@ -89,7 +82,3 @@ class RepositoryTest(unittest.TestCase):
 
         # then
         assert secret == "Not Found"
-
-
-if __name__ == '__main__':
-    unittest.main()
