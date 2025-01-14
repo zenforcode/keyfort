@@ -11,7 +11,10 @@ dependencies = [
     "msal>=1.31.1",
     "pytest>=8.3.4",
     "ruff>=0.8.5",
-    "warrant>=0.6.1",
+    "fastapi[standard]==0.115.6",
+    "fastapi-versioning>=0.10.0",
+    "msgpack>=1.1.0",
+    "dunamai==1.23.0",
 ]
 [build-system]
 requires = ["setuptools", "wheel"]

@@ -1,128 +1,142 @@
 """Data Repository Pattern"""
 
-from typing import Tuple, Optional, NoReturn
-from models import Secret, Metadata, Version
+import abc
+from typing import Tuple, Dict, Optional, NoReturn
 from copy import deepcopy
-from datetime import datetime
 
-IN_MEMORY_DB = dict()
+from keyfort.exceptions import NotCreatedException, DuplicateEntityException
 
-
-class NotCreatedException(Exception):
-    def __init__(self):
-        super().__init__("Error creating secret")
+from keyfort.models import Secret, Metadata
 
 
-class SecretRepository:
-    """Secret repository"""
-
-    def get_secret(self, secret_id: str) -> Tuple[bool, Optional[Secret]]:
-        """Get a secret.
-
-        Args:
-            secret_id (str): Identifier of the secret
-
-        Returns:
-            Tuple[bool, Optional[Secret]]: Tuple that indicates whether there is an error or not.
-        """
-        secret = IN_MEMORY_DB.get(secret_id)
-        if not secret:
-            return False, None
-        return True, deepcopy(secret)
-
-    def insert_secret(
-        self, secret_id: str, value: str, metadata: Optional[Metadata]
-    ) -> Secret | NoReturn:
+class SecretRepository(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def create(self, Secret: Secret) -> Tuple[bool, Optional[Secret]]:
         """Insert a secret
 
         Args:
-            secret_id (str): Secret Identifier
             value (str): Value of the secret
             metadata (Optional[Metadata]): Metadata associated to the secret
 
         Raises:
-            NotCreatedException: In case the db later doesn't work with the secret.
+            NotCreatedException: In case the DB later doesn't work with the secret.
 
         Returns:
-            Secret | NoReturn: Secret Value or NotCreatedException
+            Secret: Secret inserted to the DB
         """
-        now = datetime.now()
-        last_modified = now.strftime("%d%m%Y%H%M%S")
-        version = Version(version_number=0, description="", last_modified=last_modified)
-        newSecret = Secret(
-            secret_id=secret_id, value=value, version=version, metadata=metadata
-        )
-        IN_MEMORY_DB[newSecret.id] = newSecret
-        error, secret = self.get_secret(newSecret.secret_id)
-        if error:
-            raise NotCreatedException()
-        return secret
+        raise NotImplementedError()
 
-    def get_secret_info(self, secret_id: str) -> Optional[Metadata]:
-        """Get secret metadata
+    @abc.abstractmethod
+    def find(self, secret_id: str, meta: bool = False) -> Optional[Secret]:
+        """Get a secret.
 
         Args:
             secret_id (str): Secret identifier
+            meta (bool): Should DB return metadata field
 
         Returns:
-            Optional[Metadata]: Secret matadata.
+            Optional[Secret]: Secret found in DB or None
         """
-        secret = self.get_secret_meta(secret_id=secret_id)
-        if secret:
-            return secret.metadata
-        return None
+        raise NotImplementedError()
 
-    def get_secret_meta(self, secret_id: str, meta: bool = False) -> Optional[Secret]:
-        """Get secret with or without metadata
-
-        Args:
-            secret_id (str): Identifier of the sectret
-            meta (bool, optional): Metadata of the secret. Defaults to False.
-
-        Returns:
-            Optional[Secret]: A secret value.
-        """
-
-        error, secret = self.get_secret(secret_id)
-        if error:
-            return None
-        if not meta:
-            secret.meta = None
-        return secret
-
-    def update_secret_by_id(
-        self, old_secret_id: str, secret: Secret
-    ) -> Tuple[bool, str]:
+    @abc.abstractmethod
+    def update(self, new_secret: Secret) -> Tuple[bool, str]:
         """Update secret with a new one
 
         Args:
-            old_secret (Secret): Old secret to update
-            secret (Secret): New secret to update
+            new_secret (Secret): Secret with updated values
 
         Returns:
-            bool: False in case of error.
+            Tuple[bool, Optional[Secret]]: Tuple that indicates whether there is an error or not.
         """
-        error, secret_id = self.get_secret(old_secret_id)
-        if error:
-            return True, "Not Found"
-        else:
-            secret.version = secret.version + 1
-            IN_MEMORY_DB[secret_id] = secret
-        return False, "OK"
+        raise NotImplementedError()
 
-    def invalidate_secret(self, secret_id: str) -> Tuple[bool, str]:
+    @abc.abstractmethod
+    def delete(self, secret_id: str) -> Tuple[bool, str]:
         """Invalidate the secret
 
         Args:
             secret_id (str): Secret identifier
 
         Returns:
-            bool: True when the operation has success.
+            Tuple[bool, Optional[str]: Tuple that indicates whether there is an error or not.
         """
-        err, secret = self.get_secret(secret_id)
-        if err:
-            return False, "Not Found"
+        raise NotImplementedError()
+
+
+class InMemorySecretRepository(SecretRepository):
+    """In memory Secret repository"""
+
+    def __init__(self):
+        super().__init__()
+        self.IN_MEMORY_DB: Dict[str, Secret] = dict()
+
+    def create(self, secret: Secret) -> Secret | NoReturn:
+        duplicate = self.IN_MEMORY_DB.get(secret.secret_id)
+        if duplicate:
+            raise DuplicateEntityException("Secred with provided ID already exist!")
+
+        self.IN_MEMORY_DB[secret.secret_id] = secret
+        inserted = self.find(secret.secret_id)
+        if not inserted:
+            raise NotCreatedException()
+
+        return deepcopy(secret)
+
+    def find(self, secret_id: str, meta: bool = True) -> Optional[Secret]:
+        secret = self.IN_MEMORY_DB.get(secret_id)
+        if not secret:
+            return None
+
+        secret = deepcopy(secret)
+        if not meta:
+            secret.metadata = None
+
+        return secret
+
+    def update(self, secret_id: str, new_secret: str) -> Tuple[bool, str]:
+        secret = self.find(secret_id)
+        if not secret:
+            return True, "Not Found"
         else:
-            secret.metadata.is_active = True
-            IN_MEMORY_DB[secret_id] = secret
-            return True, "OK"
+            secret.value = new_secret
+            secret.version.version_number += 1
+            self.IN_MEMORY_DB[secret_id] = secret
+        return False, "OK"
+
+    def delete(self, secret_id: str) -> Tuple[bool, str]:
+        secret = self.find(secret_id)
+        if not secret:
+            return True, "Not Found"
+        else:
+            secret.metadata.is_active = False
+            self.IN_MEMORY_DB[secret_id] = secret
+            return False, "OK"
+
+
+# Example of another implementation
+class SQLSecretRepository(SecretRepository):
+    """SQL Secret repository"""
+
+    def __init__(self):
+        super().__init__()
+
+    def find(self, secret_id: str) -> Tuple[bool, Optional[Secret]]:
+        pass
+
+    def create(self, value: str, metadata: Optional[Metadata]) -> Secret | NoReturn:
+        pass
+
+    def get_secret_info(self, secret_id: str) -> Optional[Metadata]:
+        pass
+
+    def get_secret_meta(self, secret_id: str, meta: bool = False) -> Optional[Secret]:
+        pass
+
+    def update_secret_by_id(
+        self, old_secret_id: str, secret: Secret
+    ) -> Tuple[bool, str]:
+        pass
+
+    def invalidate_secret(self, secret_id: str) -> Tuple[bool, str]:
+        pass
