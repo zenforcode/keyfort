@@ -5,9 +5,7 @@ from keyfort.models import (
     UpdateSecretPayload,
 )
 
-from keyfort.services import (
-    secret_service
-)
+from keyfort.services import secret_service
 
 app = FastAPI()
 app.include_router(
@@ -15,11 +13,7 @@ app.include_router(
     prefix="/secret",
     tags=["secret"],
     # dependencies=[],
-    responses={
-        404: {
-            "description": "Not found"
-        }
-    }
+    responses={404: {"description": "Not found"}},
 )
 
 

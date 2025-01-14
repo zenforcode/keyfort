@@ -2,25 +2,34 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
-class Metadata():
+class Metadata:
     """Data model that implements the metadata for a secret."""
 
-    def __init__(self, created_at: str, updated_at: str, is_active: bool, description: Optional[str] = ""):
+    def __init__(
+        self,
+        created_at: str,
+        updated_at: str,
+        is_active: bool,
+        description: Optional[str] = "",
+    ):
         self.created_at = created_at
         self.updated_at = updated_at
         self.is_active = is_active
         self.description = description
 
     def __str__(self):
-        return "metadata = created_at: {}, is_active: {}".format(self.created_at, self.is_active)
+        return "metadata = created_at: {}, is_active: {}".format(
+            self.created_at, self.is_active
+        )
 
     def get_dto(self):
         return MetadataDTO(
             created_at=self.created_at,
             updated_at=self.updated_at,
             is_active=self.is_active,
-            description=self.description
+            description=self.description,
         )
+
 
 class MetadataDTO(BaseModel):
     created_at: str
@@ -29,10 +38,15 @@ class MetadataDTO(BaseModel):
     description: Optional[str] = ""
 
 
-class Version():
+class Version:
     """Each secret changes version to any modification."""
 
-    def __init__(self, last_modified: str, version_number: int = 0, description: Optional[str] = ""):
+    def __init__(
+        self,
+        last_modified: str,
+        version_number: int = 0,
+        description: Optional[str] = "",
+    ):
         self.version_number = version_number
         self.last_modified = last_modified
         self.description = description
@@ -47,8 +61,9 @@ class Version():
         return VersionDTO(
             version_number=self.version_number,
             last_modified=self.last_modified,
-            description=self.description
+            description=self.description,
         )
+
 
 class VersionDTO(BaseModel):
     version_number: int
@@ -56,11 +71,17 @@ class VersionDTO(BaseModel):
     description: Optional[str]
 
 
-class Secret():
+class Secret:
     """Model that contains the secret."""
 
-    def __init__(self, secret_id: str, value: str, version: Version, 
-                 description: Optional[str] = "", metadata: Optional[Metadata] = None):
+    def __init__(
+        self,
+        secret_id: str,
+        value: str,
+        version: Version,
+        description: Optional[str] = "",
+        metadata: Optional[Metadata] = None,
+    ):
         self.secret_id = secret_id
         self.value = value
         self.version = version
@@ -76,8 +97,9 @@ class Secret():
             value=self.value,
             version=self.version.get_dto(),
             description=self.description,
-            metadata=(self.metadata.get_dto() if self.metadata else None)
+            metadata=(self.metadata.get_dto() if self.metadata else None),
         )
+
 
 class SecretDTO(BaseModel):
     secret_id: str
