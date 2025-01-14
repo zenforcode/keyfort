@@ -47,7 +47,7 @@ jobs:
 
       - name: Extract semver version.
         run: |
-          ver=$(uv run dunamai from git --no-metadata --format "{base}-dev.{commit}")
+          ver=$(uv run dunamai from git --no-metadata --format "{base}-{commit}")
           echo "VERSION=${ver}" >> $GITHUB_ENV
 
       - name: Build Docker image.

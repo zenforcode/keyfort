@@ -1,3 +1,4 @@
+import pytest
 from typing import Final, Optional
 from uuid import uuid4
 from keyfort.models import Secret, Metadata, Version
@@ -32,19 +33,21 @@ def create_test_secret(id: Optional[str] = None) -> Secret:
     )
 
 
-class RepositoryTest:
+class TestRepository:
     REPOSITORY: Final[InMemorySecretRepository] = InMemorySecretRepository()
     REPOSITORY.IN_MEMORY_DB[SECRET_ID] = create_test_secret(SECRET_ID)
 
-    
     def test_successful_insert(self):
         test_secret = create_test_secret(uuid4())
         inserted = self.REPOSITORY.create(test_secret)
         assert inserted is not None
 
     def test_duplicated_insert(self):
+        # when
         test_secret = create_test_secret(SECRET_ID)
-        with self.assertRaises(DuplicateEntityException):
+
+        # then
+        with pytest.raises(DuplicateEntityException):
             self.REPOSITORY.create(test_secret)
 
     def test_successful_find(self):
