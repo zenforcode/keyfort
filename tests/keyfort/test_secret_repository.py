@@ -1,4 +1,4 @@
-import unittest
+import pytest
 from uuid import uuid4
 from keyfort.models import Secret, Metadata, Version
 from datetime import datetime
@@ -30,6 +30,7 @@ def create_test_secret(id = None) -> Secret:
         metadata=metadata
     )
 
+<<<<<<< Updated upstream
 class RepositoryTest(unittest.TestCase):
     REPOSITORY = None
 
@@ -39,6 +40,12 @@ class RepositoryTest(unittest.TestCase):
         cls.REPOSITORY.IN_MEMORY_DB[SECRET_ID] = create_test_secret(SECRET_ID)
 
         return super().setUpClass()
+=======
+
+class TestRepository:
+    REPOSITORY = InMemorySecretRepository()
+    REPOSITORY.IN_MEMORY_DB[SECRET_ID] = create_test_secret(SECRET_ID)
+>>>>>>> Stashed changes
 
     def test_successful_insert(self):
         # when
@@ -49,8 +56,15 @@ class RepositoryTest(unittest.TestCase):
         assert inserted is not None
 
     def test_duplicated_insert(self):
+        # when
         test_secret = create_test_secret(SECRET_ID)
+<<<<<<< Updated upstream
         with self.assertRaises(DuplicateEntityException) as dup_exc:
+=======
+
+        # then
+        with pytest.raises(DuplicateEntityException):
+>>>>>>> Stashed changes
             self.REPOSITORY.create(test_secret)
 
     def test_successful_find(self):
@@ -119,7 +133,3 @@ class RepositoryTest(unittest.TestCase):
         # then
         assert error == True
         assert secret == "Not Found"
-
-
-if __name__ == '__main__':
-    unittest.main()
