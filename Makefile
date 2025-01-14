@@ -18,8 +18,6 @@ docker-compose-local:	docker-build-local
 	docker compose up
 
 api-test:
-	@echo "Installing Bruno CLI..."
-	@shell command -v bru >/dev/null 2>&1 || sudo npm install -g @usebruno/cli
 	@echo "Running API tests..."
 	@cd ./tests/api-test/ && bru run
 
