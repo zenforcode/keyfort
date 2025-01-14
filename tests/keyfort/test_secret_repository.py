@@ -31,17 +31,12 @@ def create_test_secret(id: Optional[str] = None) -> Secret:
         version=version,
         metadata=metadata
     )
-  
+
 
 class TestRepository:
-    REPOSITORY = InMemorySecretRepository()
-    REPOSITORY.IN_MEMORY_DB[SECRET_ID] = create_test_secret(SECRET_ID)
-
-class RepositoryTest:
     REPOSITORY: Final[InMemorySecretRepository] = InMemorySecretRepository()
     REPOSITORY.IN_MEMORY_DB[SECRET_ID] = create_test_secret(SECRET_ID)
 
-    
     def test_successful_insert(self):
         test_secret = create_test_secret(uuid4())
         inserted = self.REPOSITORY.create(test_secret)
@@ -49,7 +44,7 @@ class RepositoryTest:
 
     def test_duplicated_insert(self):
         # when
-        with self.assertRaises(DuplicateEntityException) as dup_exc:
+        test_secret = create_test_secret(SECRET_ID)
 
         # then
         with pytest.raises(DuplicateEntityException):
