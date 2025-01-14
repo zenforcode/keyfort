@@ -20,4 +20,3 @@ docker-compose-local:	docker-build-local
 api-test:
 	@echo "Running API tests..."
 	@cd ./tests/api-test/ && bru run
-
