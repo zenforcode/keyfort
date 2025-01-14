@@ -4,19 +4,12 @@ import abc
 from typing import Tuple, Dict, Optional, NoReturn
 from copy import deepcopy
 
-from keyfort.exceptions import (
-    NotCreatedException,
-    DuplicateEntityException
-)
+from keyfort.exceptions import NotCreatedException, DuplicateEntityException
 
-from keyfort.models import (
-    Secret,
-    Metadata
-)
+from keyfort.models import Secret, Metadata
 
 
 class SecretRepository(metaclass=abc.ABCMeta):
-
     @abc.abstractmethod
     def create(self, Secret: Secret) -> Tuple[bool, Optional[Secret]]:
         """Insert a secret
@@ -34,8 +27,7 @@ class SecretRepository(metaclass=abc.ABCMeta):
         raise NotImplementedError()
 
     @abc.abstractmethod
-    def find(self, secret_id: str, meta: bool = False
-             ) -> Optional[Secret]:
+    def find(self, secret_id: str, meta: bool = False) -> Optional[Secret]:
         """Get a secret.
 
         Args:
@@ -58,7 +50,7 @@ class SecretRepository(metaclass=abc.ABCMeta):
             Tuple[bool, Optional[Secret]]: Tuple that indicates whether there is an error or not.
         """
         raise NotImplementedError()
-    
+
     @abc.abstractmethod
     def delete(self, secret_id: str) -> Tuple[bool, str]:
         """Invalidate the secret
@@ -78,33 +70,31 @@ class InMemorySecretRepository(SecretRepository):
     def __init__(self):
         super().__init__()
         self.IN_MEMORY_DB: Dict[str, Secret] = dict()
-    
+
     def create(self, secret: Secret) -> Secret | NoReturn:
         duplicate = self.IN_MEMORY_DB.get(secret.secret_id)
         if duplicate:
             raise DuplicateEntityException("Secred with provided ID already exist!")
-        
+
         self.IN_MEMORY_DB[secret.secret_id] = secret
         inserted = self.find(secret.secret_id)
         if not inserted:
             raise NotCreatedException()
-        
+
         return deepcopy(secret)
 
     def find(self, secret_id: str, meta: bool = True) -> Optional[Secret]:
         secret = self.IN_MEMORY_DB.get(secret_id)
         if not secret:
             return None
-        
+
         secret = deepcopy(secret)
         if not meta:
             secret.metadata = None
 
         return secret
 
-    def update(
-        self, secret_id: str, new_secret: str
-    ) -> Tuple[bool, str]:
+    def update(self, secret_id: str, new_secret: str) -> Tuple[bool, str]:
         secret = self.find(secret_id)
         if not secret:
             return True, "Not Found"
@@ -122,7 +112,7 @@ class InMemorySecretRepository(SecretRepository):
             secret.metadata.is_active = False
             self.IN_MEMORY_DB[secret_id] = secret
             return False, "OK"
-        
+
 
 # Example of another implementation
 class SQLSecretRepository(SecretRepository):
@@ -134,8 +124,7 @@ class SQLSecretRepository(SecretRepository):
     def find(self, secret_id: str) -> Tuple[bool, Optional[Secret]]:
         pass
 
-    def create(self, value: str, metadata: Optional[Metadata]
-    ) -> Secret | NoReturn:
+    def create(self, value: str, metadata: Optional[Metadata]) -> Secret | NoReturn:
         pass
 
     def get_secret_info(self, secret_id: str) -> Optional[Metadata]:

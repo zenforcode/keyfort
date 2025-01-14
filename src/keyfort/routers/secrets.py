@@ -14,8 +14,8 @@ router = APIRouter()
 @router.post("/")
 def create_secret(payload: CreateSecretPayload) -> SecretDTO:
     try:
-        return secret_service.create_secret(payload)        
-        
+        return secret_service.create_secret(payload)
+
     except NotCreatedException:
         raise HTTPException(status_code=404, detail="Could not create secret")
 
@@ -26,7 +26,7 @@ def get_secret(secret_id: str, meta: bool = False) -> SecretDTO:
 
     if not secret:
         raise HTTPException(status_code=404, detail="Could not retreive secret")
-    
+
     return secret
 
 
@@ -46,5 +46,5 @@ def invalidate_secret(secret_id: str) -> str:
 
     if deleted != "OK":
         raise HTTPException(status_code=404, detail="Could not invalidate secret")
-    
+
     return "OK"

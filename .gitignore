@@ -11,6 +11,13 @@ sdks/
 # C extensions
 *.so
 
+# JS dependencies
+node_modules/
+
+# Fern
+fern/
+sdks/
+
 # NixOS env files
 .direnv
 flake.nix

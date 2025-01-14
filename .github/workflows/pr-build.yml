@@ -14,11 +14,18 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.12' 
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 
+
       - name: Install Python dependencies
         run: |
           python -m pip install --upgrade pip
@@ -27,13 +34,25 @@ jobs:
           source .venv/bin/activate
           uv sync
 
-      - name: Build the code.
+      - name: Install Node dependencies
         run: |
-<<<<<<< Updated upstream
-          make build
-    
-=======
           npm install
+
+      - name: Export OpenAPI spec and generate SDK.
+        run: |
+          uv run extract-openapi.py
+          npm run fern:init
+          npm run fern:all
+          npm run fern:gen
+
+      - name: Extract semver version.
+        run: |
+          ver=$(uv run dunamai from git --no-metadata --format "{base}-dev.{commit}")
+          echo "VERSION=${ver}" >> $GITHUB_ENV
+
+      - name: Build Docker image.
+        run: |
+          make build
 
       - name: Export OpenAPI spec and generate SDK.
         run: |
@@ -51,4 +70,3 @@ jobs:
         run: |
           echo "${{ env.VERSION }}"
           docker build . -t artifactory.keyfort.zenforcode.com:latest
->>>>>>> Stashed changes

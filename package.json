@@ -1,0 +1,24 @@
+{
+  "name": "keyfort",
+  "version": "1.0.0",
+  "description": "The KeyFort Server is a secure, centralized solution for managing and storing sensitive data such as API keys, credentials, tokens, and other secrets. This server is designed with encryption, access control, and auditing features to ensure data security and compliance with industry standards.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "fern:init": "fern init --openapi ./openapi.json --org zenforcode",
+    "fern:ts": "fern add fern-typescript-node-sdk --group sdk", 
+    "fern:go": "fern add fern-go-sdk --group sdk",
+    "fern:java": "fern add fern-java-sdk --group sdk",
+    "fern:all": "npm run fern:ts && npm run fern:go",
+    "fern:gen": "fern generate --group sdk --local"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "fern-api": "^0.47.1"
+  }
+}
