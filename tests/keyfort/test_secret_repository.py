@@ -1,4 +1,4 @@
-import unittest
+from typing import Final, Optional
 from uuid import uuid4
 from keyfort.models import Secret, Metadata, Version
 from datetime import datetime
@@ -6,10 +6,10 @@ from keyfort.repository import InMemorySecretRepository
 from keyfort.exceptions import DuplicateEntityException
 
 
-SECRET_ID = "ca2f7ca0-1465-450c-acbe-51c8d165fb8f"
+SECRET_ID: Final[str] = "ca2f7ca0-1465-450c-acbe-51c8d165fb8f"
 
 
-def create_test_secret(id=None) -> Secret:
+def create_test_secret(id: Optional[str] = None) -> Secret:
     id = id if id is not None else SECRET_ID
     now = datetime.now()
     last_modified = now.strftime("%d%m%Y%H%M%S")
@@ -32,22 +32,14 @@ def create_test_secret(id=None) -> Secret:
     )
 
 
-class RepositoryTest(unittest.TestCase):
-    REPOSITORY = None
+class RepositoryTest:
+    REPOSITORY: Final[InMemorySecretRepository] = InMemorySecretRepository()
+    REPOSITORY.IN_MEMORY_DB[SECRET_ID] = create_test_secret(SECRET_ID)
 
-    @classmethod
-    def setUpClass(cls):
-        cls.REPOSITORY = InMemorySecretRepository()
-        cls.REPOSITORY.IN_MEMORY_DB[SECRET_ID] = create_test_secret(SECRET_ID)
-
-        return super().setUpClass()
-
+    
     def test_successful_insert(self):
-        # when
         test_secret = create_test_secret(uuid4())
         inserted = self.REPOSITORY.create(test_secret)
-
-        # then
         assert inserted is not None
 
     def test_duplicated_insert(self):
@@ -111,7 +103,3 @@ class RepositoryTest(unittest.TestCase):
         # then
         assert error
         assert secret == "Not Found"
-
-
-if __name__ == '__main__':
-    unittest.main()
