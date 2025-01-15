@@ -12,7 +12,10 @@ test:
 	@uv run coverage report -m
 run:
 	@uv run .venv/bin/fastapi run src/keyfort/main.py --port 8080 --host 0.0.0.0
-docker-build-local:	build
-	docker build . -t artifactory.keyfort.zenforcode.com:latest
+version:
+	$(eval VERSION := $(shell uv run dunamai from git --no-metadata --format "{base}-{commit}"))
+	@echo ${VERSION}
+docker-build-local:	build	version
+	docker build . -t artifactory.keyfort.zenforcode.com:${VERSION}
 docker-compose-local:	docker-build-local
 	docker compose up
