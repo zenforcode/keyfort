@@ -16,3 +16,7 @@ docker-build-local:	build
 	docker build . -t artifactory.keyfort.zenforcode.com:latest
 docker-compose-local:	docker-build-local
 	docker compose up
+
+api-test:
+	@echo "Running API tests..."
+	@cd ./tests/api-test/ && bru run
