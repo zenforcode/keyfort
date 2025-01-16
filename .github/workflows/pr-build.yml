@@ -53,4 +53,18 @@ jobs:
       - name: Build Docker image.
         run: |
           echo "${{ env.VERSION }}"
-          docker build . -t artifactory.keyfort.zenforcode.com:latest
+          docker build . -t artifactory.keyfort.zenforcode.com:${{ env.VERSION }}
+
+      - name: Create a release.
+        if: ${{ github.ref == 'refs/heads/release' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ env.VERSION }}
+        run: |
+          docker build . -t artifactory.keyfort.zenforcode.com:${{ env.VERSION }}
+          echo "Creating tag: v${{ env.VERSION }} and publishing a release"
+          gh release create "$tag" \
+              --repo="$GITHUB_REPOSITORY" \
+              --title="v${tag}" \
+              --generate-notes
+
