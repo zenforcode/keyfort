@@ -1,0 +1,28 @@
+name: Merge Build
+on: 
+  push:
+    branches:
+      - release
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GIT_TOKEN }}
+
+      - name: create version
+        run: |
+          ver=$(uv run dunamai from git --no-metadata --format "{base}-{commit}")
+          echo "VERSION=${ver}" >> $GITHUB_ENV
+
+      - name: create release
+        if: ${{ github.ref == 'refs/heads/release' }}
+        run: |
+          gh release create "${{ env.VERSION }}" \
+              --repo="$GITHUB_REPOSITORY" \
+              --title="v${tag}" \
+              --generate-notes
