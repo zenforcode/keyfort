@@ -22,7 +22,7 @@ jobs:
           fi
       - name: Create Git Tag
         env:
-          GITHUB_TOKEN: ${{ secrets.CREATE_TAG }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=${{ github.event.inputs.version }}
           echo "Tagging version: $VERSION"
