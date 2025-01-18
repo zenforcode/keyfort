@@ -26,5 +26,7 @@ jobs:
         run: |
           VERSION=${{ github.event.inputs.version }}
           echo "Tagging version: $VERSION"
+          git config user.name "Ritek"
+          git config user.email "writhaler@gmail.com"
           git tag -a "$VERSION" -m "Release $VERSION"
           git push origin "$VERSION"
