@@ -8,6 +8,9 @@ on:
         default: 1.0.0
 jobs:
   versioning:
+    permissions:
+      contents: write  
+      actions: read 
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
