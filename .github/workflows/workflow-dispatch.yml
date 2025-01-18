@@ -20,13 +20,16 @@ jobs:
             echo "Invalid version format. Expected format: X.Y.Z (e.g., 1.0.0)"
             exit 1
           fi
-      - name: Create Git Tag
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Create and Push Git Tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           VERSION=${{ github.event.inputs.version }}
           echo "Tagging version: $VERSION"
-          git config user.name "Ritek"
-          git config user.email "writhaler@gmail.com"
           git tag -a "$VERSION" -m "Release $VERSION"
           git push origin "$VERSION"
+          
