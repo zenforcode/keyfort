@@ -15,13 +15,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Validate version
+      - name: Set version
         run: |
           ver="${{ github.event.inputs.version }}"
           echo "VERSION=${ver}" >> $GITHUB_ENV
-          echo "Validating version: ${{ env.VERSION }}"
-
-          if [[ ! "${{ env.VERSION }}" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+      - name: Validate version
+        env: 
+          VERSION: ${{ env.VERSION }}
+        run: |
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Invalid version format. Expected format: vX.Y.Z (e.g., v1.0.0)"
             exit 1
           fi
