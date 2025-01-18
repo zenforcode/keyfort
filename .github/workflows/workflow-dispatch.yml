@@ -51,8 +51,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_VERSION: ${{ github.event.inputs.version }}
         with:
-          tag_name: $RELEASE_VERSION
-          release_name: Release_${{RELEASE_VERSION}}
+          tag_name: ${{ github.event.inputs.version }}
+          release_name: Release_${{ github.event.inputs.version }}
           draft: false
           prerelease: false
           
