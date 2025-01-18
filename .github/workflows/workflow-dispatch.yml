@@ -36,6 +36,9 @@ jobs:
           git tag -a "$RELEASE_VERSION" -m "Release $RELEASE_VERSION"
           git push origin "$RELEASE_VERSION"
 
+      - name: Install UV
+        uses: astral-sh/setup-uv@v5.2.1
+          
       - name: Build 
         run: |
           make build
