@@ -1,4 +1,5 @@
-name: Workflow Dispatch with Versionon:
+name: Workflow Dispatch with Version
+on:
   workflow_dispatch:
     inputs:
       version:
