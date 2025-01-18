@@ -43,6 +43,6 @@ jobs:
           npm run fern:all
           npm run fern:gen
 
-      - name: Run test
+      - name: Run test and build
         run: |
           make build
