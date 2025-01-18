@@ -29,4 +29,4 @@ jobs:
           git config user.name "Ritek"
           git config user.email "writhaler@gmail.com"
           git tag -a "$VERSION" -m "Release $VERSION"
-          git push origin "$VERSION"
+          git push "$VERSION"
