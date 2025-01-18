@@ -21,6 +21,8 @@ jobs:
             exit 1
           fi
       - name: Create Git Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.CREATE_TAG }}
         run: |
           VERSION=${{ github.event.inputs.version }}
           echo "Tagging version: $VERSION"
