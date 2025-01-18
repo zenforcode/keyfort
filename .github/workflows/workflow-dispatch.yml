@@ -43,14 +43,25 @@ jobs:
         run: |
           make build
 
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+          
       - name: Upload to GitHub Release
         env:
           RELEASE_VERSION: ${{ github.event.inputs.version }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: actions/upload-release-asset@v1
         with:
-          upload_url: ${{ github.event.release.upload_url }}
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: dist/*.whl
-          asset_name: release-${RELEASE_VERSION}.whl
+          asset_name: keyfort-${RELEASE_VERSION}.whl
           asset_content_type: application/octet-stream
           
