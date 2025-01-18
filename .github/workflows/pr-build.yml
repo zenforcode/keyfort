@@ -25,6 +25,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20 
+        run: |
+          npm install
 
       - name: Install Python dependencies
         run: |
@@ -34,10 +36,6 @@ jobs:
           source .venv/bin/activate
           uv sync
 
-      - name: Install Node dependencies
-        run: |
-          npm install
-
       - name: Export OpenAPI spec and generate SDK.
         run: |
           uv run extract-openapi.py
@@ -45,26 +43,6 @@ jobs:
           npm run fern:all
           npm run fern:gen
 
-      - name: Extract semver version.
+      - name: Run test
         run: |
-          ver=$(uv run dunamai from git --no-metadata --format "{base}-{commit}")
-          echo "VERSION=${ver}" >> $GITHUB_ENV
-
-      - name: Build Docker image.
-        run: |
-          echo "${{ env.VERSION }}"
-          docker build . -t artifactory.keyfort.zenforcode.com:${{ env.VERSION }}
-
-      - name: Create a release.
-        if: ${{ github.ref == 'refs/heads/release' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ env.VERSION }}
-        run: |
-          docker build . -t artifactory.keyfort.zenforcode.com:${{ env.VERSION }}
-          echo "Creating tag: v${{ env.VERSION }} and publishing a release"
-          gh release create "$tag" \
-              --repo="$GITHUB_REPOSITORY" \
-              --title="v${tag}" \
-              --generate-notes
-
+          make build
