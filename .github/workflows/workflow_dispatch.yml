@@ -1,12 +1,12 @@
+---
 name: Workflow Dispatch with Version
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version number (e.g., 1.0.0)'
+        description: Version number (e.g., 1.0.0)
         required: true
-        default: '1.0.0'
-
+        default: 1.0.0
 jobs:
   versioning:
     runs-on: ubuntu-latest
@@ -14,8 +14,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Validate version
-        run: |
+        run: >
           echo "Validating version: ${{ github.event.inputs.version }}"
+
           if [[ ! "${{ github.event.inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "Invalid version format. Expected format: X.Y.Z (e.g., 1.0.0)"
             exit 1
