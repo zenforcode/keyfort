@@ -8,6 +8,9 @@ on:
         default: 1.0.0
 jobs:
   validate-team:
+    permissions:
+      contents: write  
+      actions: read
     runs-on: ubuntu-latest
     steps:
       - name: Check Team Membership
