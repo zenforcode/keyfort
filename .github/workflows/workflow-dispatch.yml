@@ -36,6 +36,10 @@ jobs:
           git tag -a "$RELEASE_VERSION" -m "Release $RELEASE_VERSION"
           git push origin "$RELEASE_VERSION"
 
+      - name: Build 
+        run: |
+          make build
+
       - name: Upload to GitHub Release
         env:
           RELEASE_VERSION: ${{ github.event.inputs.version }}
