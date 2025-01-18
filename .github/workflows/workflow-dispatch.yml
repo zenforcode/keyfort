@@ -27,14 +27,15 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      - name: Create and Push Git Tag
-        env:
-          RELEASE_VERSION: ${{ github.event.inputs.version }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Tagging version: $RELEASE_VERSION"
-          git tag -a "$RELEASE_VERSION" -m "Release $RELEASE_VERSION"
-          git push origin "$RELEASE_VERSION"
+          
+      # - name: Create and Push Git Tag
+      #   env:
+      #     RELEASE_VERSION: ${{ github.event.inputs.version }}
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     echo "Tagging version: $RELEASE_VERSION"
+      #     git tag -a "$RELEASE_VERSION" -m "Release $RELEASE_VERSION"
+      #     git push origin "$RELEASE_VERSION"
 
       - name: Install UV
         uses: astral-sh/setup-uv@v5.2.1
@@ -51,7 +52,7 @@ jobs:
           RELEASE_VERSION: ${{ github.event.inputs.version }}
         with:
           tag_name: "$RELEASE_VERSION"
-          release_name: "Release $RELEASE_VERSION"
+          release_name: "Release ${RELEASE_VERSION}"
           draft: false
           prerelease: false
           
