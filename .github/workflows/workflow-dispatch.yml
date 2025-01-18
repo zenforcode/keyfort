@@ -35,4 +35,17 @@ jobs:
           echo "Tagging version: $RELEASE_VERSION"
           git tag -a "$RELEASE_VERSION" -m "Release $RELEASE_VERSION"
           git push origin "$RELEASE_VERSION"
+
+      - name: Upload to GitHub Release
+        env:
+          RELEASE_VERSION: ${{ github.event.inputs.version }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: dist/*.whl
+          asset_name: release-${RELEASE_VERSION}.whl
+          asset_content_type: application/octet-stream
           
