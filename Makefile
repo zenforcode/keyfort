@@ -3,7 +3,7 @@ lint:
 checks:
 	@uv run ruff check --fix
 build: lint checks test
-	@uv build
+	@uv build go build
 format:
 	@uv run ruff check --fix src
 	@uv run ruff format src
