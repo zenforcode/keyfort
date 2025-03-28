@@ -8,7 +8,7 @@ import (
 
 var stopCmd = &cobra.Command{
 	Use:   "stop",
-	Short: "Stop keyvault-server",
+	Short: "Stop KeyFort Server",
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Stopped!")
 	},

@@ -1,3 +1,4 @@
+all: format lint build
 lint:
 	golangci-lint run ./...
 
@@ -5,7 +6,7 @@ checks:
 	golangci-lint run --fix ./...
 
 build: lint checks test
-	go build -o ./bin/keyfort ./main.go
+	go build -o ./bin/keyfort-server ./main.go
 
 format:
 	go fmt ./...
@@ -14,7 +15,7 @@ test:
 	go test -cover ./...
 
 run:
-	go run ./cmd/keyfort/main.go --port 8080 --host 0.0.0.0
+	go run ./main.go start --port 8080 --host 0.0.0.0
 
 version:
 	$(eval VERSION := $(shell git describe --tags --always --dirty))
