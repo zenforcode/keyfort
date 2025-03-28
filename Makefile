@@ -1,23 +1,29 @@
 lint:
-	@uv run ruff check src/keyfort
+	golangci-lint run ./...
+
 checks:
-	@uv run ruff check --fix
+	golangci-lint run --fix ./...
+
 build: lint checks test
-	@uv build go build
+	go build -o ./bin/keyfort ./cmd/keyfort/main.go
+
 format:
-	@uv run ruff check --fix src
-	@uv run ruff format src
+	go fmt ./...
+
 test:
-	@uv run coverage run --source=./src -m pytest ./tests
-	@uv run coverage report -m
+	go test -cover ./...
+
 run:
-	@uv run .venv/bin/fastapi run src/keyfort/main.py --port 8080 --host 0.0.0.0
+	go run ./cmd/keyfort/main.go --port 8080 --host 0.0.0.0
+
 version:
-	$(eval VERSION := $(shell uv run dunamai from git --no-metadata --format "{base}-{commit}"))
+	$(eval VERSION := $(shell git describe --tags --always --dirty))
 	@echo ${VERSION}
-docker-build-local:	build	version
+
+docker-build-local: build version
 	docker build . -t artifactory.keyfort.zenforcode.com:${VERSION}
-docker-compose-local:	docker-build-local
+
+docker-compose-local: docker-build-local
 	docker compose up
 
 api-test:
