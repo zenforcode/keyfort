@@ -2,6 +2,79 @@
 ## Overview
 The KeyFort Server is a secure, centralized solution for managing and storing sensitive data such as API keys, credentials, tokens, and other secrets. This server is designed with encryption, access control, and auditing features to ensure data security and compliance with industry standards.
 
+## Architecture
+
+```mermaid
+graph TD
+
+  subgraph Client
+    A[REST API Client]
+  end
+
+  subgraph Keyfort
+    B[REST API Server]
+
+    B1[Authenticate]
+    B2[GetSecret]
+    B3[SetSecret]
+    B4[Tokenize]
+    B5[Encipher]
+
+    B6[IdentityService]
+    B7[CryptoService]
+    B8[SecretService]
+  end
+
+  subgraph CloudProviders
+    C1[Azure Identity Provider]
+    C2[AWS Identity Provider]
+  end
+
+  subgraph HSMs
+    D1[SoftHSM]
+    D2[AWS/Azure HSM]
+  end
+
+  subgraph Storage
+    E[FoundationDB]
+  end
+
+  %% Client to API
+  A --> B
+
+  %% API ops
+  B --> B1
+  B --> B2
+  B --> B3
+  B --> B4
+  B --> B5
+
+  %% IdentityService
+  B1 --> B6
+  B2 --> B6
+  B3 --> B6
+  B4 --> B6
+  B5 --> B6
+
+  B6 --> C1
+  B6 --> C2
+
+  %% CryptoService
+  B2 --> B7
+  B3 --> B7
+  B4 --> B7
+  B5 --> B7
+
+  B7 --> D1
+  B7 --> D2
+
+  %% SecretService
+  B2 --> B8
+  B3 --> B8
+
+  B8 --> E
+```
+
 ## Features
 - **Secure Storage**: Encrypts all stored data with robust encryption algorithms.
 - **Access Control**: Role-based access control (RBAC) for managing user permissions.
