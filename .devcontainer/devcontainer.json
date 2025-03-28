@@ -1,0 +1,19 @@
+{
+  "name": "Go + Reveal.js + Python",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash"
+  },
+  "extensions": [
+    "golang.go",
+    "ms-python.python",
+    "esbenp.prettier-vscode",
+    "yzhang.markdown-all-in-one"
+  ],
+  "postCreateCommand": "go mod tidy || true",
+  "forwardPorts": [3000], // Adjust for your Reveal.js dev server
+  "remoteUser": "vscode"
+}
+
