@@ -87,7 +87,7 @@ graph TD
 Before setting up the KeyVault Server, ensure the following:
 - **Operating System**: Linux (preferred), macOS, or Windows.
 - **Dependencies**:
-  - Python 3.11+
+  - Go lang
   - FoundationDB (for backend storage)
 
 ## Installation
@@ -97,27 +97,18 @@ Before setting up the KeyVault Server, ensure the following:
    cd keyfort
    ```
 
-2. **Set up a virtual environment**:
+2. **Install the linter**:
+  ```bash
+  curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.0.2
+  golangci-lint --version
+  ```
+3. **Build**:
    ```bash
-   pip install uv
-   uv venv
-   source .venv/bin/activate
+  make
    ```
 
-3. **Install dependencies**:
-   ```bash
-   uv sync
-   ```
 
-4. **Configure the environment**:
-   - Copy the `.env.example` file and rename it to `.env`.
-   - Update the configuration in `.env`:
-     - Database connection string
-     - Secret key for encryption
-     - Other environment variables
-
-
-5. **Start the server**:
+4. **Start the server**:
    ```bash
    make run
    ```
@@ -129,30 +120,6 @@ All configurations are managed through the `.env` file. Key settings include:
 - `API_PORT`: Port number for the server.
 - `LOG_LEVEL`: Logging verbosity (e.g., DEBUG, INFO, WARNING).
 
-## Usage
-### Adding a Secret
-To add a secret, use the `/secrets` API endpoint:
-```bash
-curl -X POST -H "Content-Type: application/json" -d '{"key": "api-key", "value": "12345"}' http://localhost:5000/secrets
-```
-
-### Retrieving a Secret
-To retrieve a secret, use the `/secrets/{key}` endpoint:
-```bash
-curl -X GET http://localhost:5000/secrets/api-key
-```
-
-### Deleting a Secret
-To delete a secret, use the `/secrets/{key}` endpoint:
-```bash
-curl -X DELETE http://localhost:5000/secrets/api-key
-```
-
-## Security
-- **Encryption**: All secrets are encrypted at rest using AES-256.
-- **Authentication**: Supports API key or JWT-based authentication for API access.
-- **Authorization**: Role-based access control ensures only authorized users can perform specific actions.
-- **Auditing**: All actions are logged for monitoring and auditing purposes.
 
 ## Testing
 Run unit tests to ensure the application is functioning as expected:

@@ -5,7 +5,7 @@ checks:
 	golangci-lint run --fix ./...
 
 build: lint checks test
-	go build -o ./bin/keyfort ./cmd/keyfort/main.go
+	go build -o ./bin/keyfort ./main.go
 
 format:
 	go fmt ./...
