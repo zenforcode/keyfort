@@ -1,8 +1,9 @@
 {
   "name": "Go + Reveal.js + Python",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspace",
+  "forwardPorts": [3000,8080, 4500],
   "settings": {
     "terminal.integrated.defaultProfile.linux": "bash"
   },
@@ -16,4 +17,3 @@
   "forwardPorts": [3000], // Adjust for your Reveal.js dev server
   "remoteUser": "vscode"
 }
-
